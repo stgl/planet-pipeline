@@ -4,8 +4,11 @@
 import sys
 
 
-LOCATION = {'latitude': 31.021,
-            'longitude': 103.367}
+LOCATION = {'min_latitude': 30.4,
+            'min_longitude': 102.4,
+            'max_latitude': 32.8,
+            'max_longitude': 105.1}
+
 TIMES = {'start': '2008-05-22',
          'end': '2009-05-22'}
 
@@ -13,19 +16,20 @@ SATELLITE_INFO = {'satellite': 5}
 
 OUTPUT = {'output_path': 'wenchuan'}
 
+CB_PERCENT = 5.0
+
 LS_PIPELINE = ('landslide_pipeline.landsat_loader.load_data', # landsat_loader download
                'landslide_pipeline.landsat_loader.rgb_scenes',
                'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
-               #'pipeline.record_last_time_instrument_was_contacted',
-               #'pipeline.transfer_new_data',
-               #'pipeline.record_new_data_that_was_transferred',
-#               'pipeline.load_summary_ec_data',
-#               'pipeline.filter_data',
-#               'pipeline.write_excel_spreadsheet',
-#               'pipeline.plot_data_within_time_window',
-#               'ec_inversion.invert_data',
-#               'ec_inversion.plot_inversion_results_within_time_window',
+               'landslide_pipeline.mosaic.mosaic',
+               'landslide_pipeline.color.correct',
+               'landslide_pipeline.image_chips.create',
                )
+
+STRETCH_STD = 2.0
+
+MAP = 'wenchuan_landslide_map'
+MIN_AREA = 2.5E5
 
 def import_module(name):
     __import__(name)
