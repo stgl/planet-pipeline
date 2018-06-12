@@ -18,18 +18,37 @@ OUTPUT = {'output_path': 'wenchuan'}
 
 CB_PERCENT = 5.0
 
-LS_PIPELINE = ('landslide_pipeline.landsat_loader.load_data', # landsat_loader download
-               'landslide_pipeline.landsat_loader.rgb_scenes',
-               'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
-               'landslide_pipeline.mosaic.mosaic',
-               'landslide_pipeline.color.correct',
-               'landslide_pipeline.image_chips.create',
+LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader download
+               #'landslide_pipeline.landsat_loader.rgb_scenes',
+               #'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
+               #'landslide_pipeline.mosaic.mosaic',
+               #'landslide_pipeline.color.correct',
+               #'landslide_pipeline.image_chips.create',
+               #'landslide_pipeline.image_chips.convert',
+               #'landslide_pipeline.tensorflow.chips_to_tfrecords',
+               #'landslide_pipeline.tensorflow.train',
+               #'landslide_pipeline.tensorflow.export',
+               'landslide_pipeline.tensorflow.classify',
                )
 
 STRETCH_STD = 2.0
 
+CHIP_SIZE = 300
+
+TRAINING_FRACTION = 0.7
+TRAINING_EXEC_PATH = '/Users/hilley/Documents/GitHub/models/research/object_detection/train.py'
+EVAL_EXEC_PATH = '/Users/hilley/Documents/GitHub/models/research/object_detection/eval.py'
+TRAINING_CONFIG_PATH = './models/faster_rcnn_resnet101_landslides.config'
+TRAINING_PATH = './models/model/train'
+EVAL_PATH = './models/model/eval'
+
+TRAINING_EXPORT_EXEC_PATH = '/Users/hilley/Documents/GitHub/models/research/object_detection/export_inference_graph.py'
+TRAINING_EXPORT_PATH = './models/model/export'
+
 MAP = 'wenchuan_landslide_map'
 MIN_AREA = 2.5E5
+
+CLASSIFY_IMAGE = 'wenchuan/wenchuan_clip_cb.jpg'
 
 def import_module(name):
     __import__(name)
