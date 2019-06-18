@@ -18,16 +18,16 @@ OUTPUT = {'output_path': 'wenchuan'}
 
 CB_PERCENT = 5.0
 
-LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader download
-               #'landslide_pipeline.landsat_loader.rgb_scenes',
-               #'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
-               #'landslide_pipeline.mosaic.mosaic',
-               #'landslide_pipeline.color.correct',
-               #'landslide_pipeline.image_chips.create',
-               #'landslide_pipeline.image_chips.convert',
-               #'landslide_pipeline.tensorflow.chips_to_tfrecords',
-               #'landslide_pipeline.tensorflow.train',
-               #'landslide_pipeline.tensorflow.export',
+LS_PIPELINE = ('landslide_pipeline.landsat_loader.load_data', # landsat_loader download
+               'landslide_pipeline.landsat_loader.rgb_scenes',
+               'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
+               'landslide_pipeline.mosaic.mosaic',
+               'landslide_pipeline.color.correct',
+               'landslide_pipeline.image_chips.create',
+               'landslide_pipeline.image_chips.convert',
+               'landslide_pipeline.tensorflow.chips_to_tfrecords',
+               'landslide_pipeline.tensorflow.train',
+               'landslide_pipeline.tensorflow.export',
                'landslide_pipeline.tensorflow.classify',
                )
 
