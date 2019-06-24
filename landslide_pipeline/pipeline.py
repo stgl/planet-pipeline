@@ -9,10 +9,14 @@ LOCATION = {'min_latitude': 30.4,
             'max_latitude': 32.8,
             'max_longitude': 105.1}
 
-TIMES = {'start': '2008-05-22',
-         'end': '2009-05-22'}
+#TIMES = {'start': '2008-05-22',
+#         'end': '2009-05-22'}
 
-SATELLITE_INFO = {'satellite': 5}
+#SATELLITE_INFO = {'satellite': 5}
+SATELLITE_INFO = ['PSOrthoTile', 'REOrthoTile']
+TIMES = {'start': "2019-06-16T00:00:00Z",
+         'end': "2019-06-20T00:00:00Z"}
+
 
 OUTPUT = {'output_path': 'wenchuan'}
 
