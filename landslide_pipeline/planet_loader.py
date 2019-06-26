@@ -1,3 +1,7 @@
+import planet
+from planet.scripts.v1 import download
+
+
 def load_data(*args, **kwargs):
     from landslide_pipeline.pipeline import LOCATION, TIMES, SATELLITE_INFO, OUTPUT
     import os
@@ -74,6 +78,12 @@ def load_data(*args, **kwargs):
     items = client.quick_search(query_and_geofilter)
 
     # Download items:
+    os.mkdir("image_prefixes")
+    planet.api.dowloader.create(client, kwargs)
+    download(items, "asset_types", "image_prefixes")
+
+
+
 
     # Save items (if not done so already, making sure they are stored in OUTPUT['output_path']):
 
