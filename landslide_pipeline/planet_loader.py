@@ -1,5 +1,4 @@
 import planet
-from planet.scripts.v1 import download
 
 
 def load_data(*args, **kwargs):
@@ -75,14 +74,24 @@ def load_data(*args, **kwargs):
         }
     }
 
-    items = client.quick_search(query_and_geofilter)
+    items = client.quick_search(query_and_geofilter, page_size=250)
+
+    num_items = 0
+    for item in items.items_iter(250):
+        num_items += 1
+    print('Query returned ' + str(num_items) + ' items')
 
     # Download items:
-    os.mkdir("image_prefixes")
-    planet.api.dowloader.create(client, kwargs)
-    download(items, "asset_types", "image_prefixes")
+    try:
+        os.mkdir(OUTPUT['output_path'])
+    except:
+        pass
+    from planet.api.downloader import create
+    downloader = create(client)
+    downloader.download(items, ['visual', 'analytic'], OUTPUT['output_path'])
 
-
+    '''
+    
 
 
     # Save items (if not done so already, making sure they are stored in OUTPUT['output_path']):
@@ -96,6 +105,8 @@ def load_data(*args, **kwargs):
     #image_prefixes = downloads that i get from planet
     #kwargs['image_prefixes'] = <List of strings with location of each downloaded image>
     kwargs.update(this_args)
+
+    '''
 
     return kwargs
 

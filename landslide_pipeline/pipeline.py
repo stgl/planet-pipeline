@@ -3,11 +3,18 @@
 # Python script to implement landslide mapping download and processing pipeline.
 import sys
 
-
+'''
 LOCATION = {'min_latitude': 30.4,
             'min_longitude': 102.4,
             'max_latitude': 32.8,
             'max_longitude': 105.1}
+'''
+
+LOCATION = {'min_latitude': 37.4146,
+            'min_longitude': -122.1834,
+            'max_latitude': 37.4383,
+            'max_longitude': -122.1561}
+
 
 #TIMES = {'start': '2008-05-22',
 #         'end': '2009-05-22'}
