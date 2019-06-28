@@ -82,13 +82,14 @@ def load_data(*args, **kwargs):
     print('Query returned ' + str(num_items) + ' items')
 
     # Download items:
+    output_directory = os.path.join(os.getcwd(), OUTPUT['output_path'])
     try:
-        os.mkdir(OUTPUT['output_path'])
+        os.mkdir(output_directory)
     except:
         pass
     from planet.api.downloader import create
     downloader = create(client)
-    downloader.download(items, ['visual', 'analytic'], OUTPUT['output_path'])
+    downloader.download(items, ['visual', 'analytic'], output_directory)
 
     '''
     
