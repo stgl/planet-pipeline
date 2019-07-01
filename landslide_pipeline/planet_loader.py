@@ -1,10 +1,9 @@
-import planet
-
 
 def load_data(*args, **kwargs):
     from landslide_pipeline.pipeline import LOCATION, TIMES, SATELLITE_INFO, OUTPUT
     import os
     import planet.api as api
+    import requests
 
     # Set up client:
 
@@ -77,9 +76,9 @@ def load_data(*args, **kwargs):
     items = client.quick_search(query_and_geofilter, page_size=250)
 
     num_items = 0
-    for item in items.items_iter(250):
+    for _ in items.items_iter(250):
         num_items += 1
-    print('Query returned ' + str(num_items) + ' items')
+    print('Query returned ' + str(num_items) + ' items.')
 
     # Download items:
     output_directory = os.path.join(os.getcwd(), OUTPUT['output_path'])
@@ -87,13 +86,55 @@ def load_data(*args, **kwargs):
         os.mkdir(output_directory)
     except:
         pass
-    from planet.api.downloader import create
-    downloader = create(client)
-    downloader.download(items, ['visual', 'analytic'], output_directory)
 
-    '''
-    
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    executor = ThreadPoolExecutor(5)
 
+    all_futures = []
+
+    def activate_and_download(item):
+
+        # setup auth
+        session = requests.Session()
+        session.auth = (api_key, '')
+
+        assets = client.get_assets(item).get()
+        asset_futures = []
+
+        def activate_and_download_asset_type(asset_type):
+            activated = False
+            while not activated:
+                dataset = \
+                    session.get(
+                        ("https://api.planet.com/data/v1/item-types/" +
+                        "{}/items/{}/assets/").format(item['properties']['item_type'], item['id']))
+                # extract the activation url from the item for the desired asset
+                item_activation_url = dataset.json()[asset_type]["_links"]["activate"]
+                # request activation
+                response = session.post(item_activation_url)
+                activated = (response.status_code == 204)
+                if not activated:
+                    print("Waiting for activation of: ", item['id'])
+                    import time
+                    time.sleep(30.0)
+            asset = client.get_assets(item).get()[asset_type]
+            callback = api.write_to_file(directory=output_directory, callback=None, overwrite=True)
+            body = client.download(asset, callback=callback)
+            body.await()
+            return True
+
+        if assets.get('visual', None) is not None:
+            asset_futures += [executor.submit(activate_and_download_asset_type, 'visual')]
+        if assets.get('analytic', None) is not None:
+            asset_futures += [executor.submit(activate_and_download_asset_type, 'analytic')]
+
+        return asset_futures
+
+    for item_i in items.items_iter(250):
+        all_futures += activate_and_download(item_i)
+
+    for _ in as_completed(all_futures):
+        print('Finished downloading asset.')
 
     # Save items (if not done so already, making sure they are stored in OUTPUT['output_path']):
 
@@ -107,10 +148,7 @@ def load_data(*args, **kwargs):
     #kwargs['image_prefixes'] = <List of strings with location of each downloaded image>
     kwargs.update(this_args)
 
-    '''
-
-    return kwargs
-
+    return
 
 '''
     pr = get_paths_rows((LOCATION['min_longitude'], LOCATION['min_latitude']),
