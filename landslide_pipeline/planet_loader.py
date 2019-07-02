@@ -4,6 +4,7 @@ def load_data(*args, **kwargs):
     import os
     import planet.api as api
     import requests
+    from landslide_pipeline.pipeline import OUTPUT
 
     # Set up client:
 
@@ -137,6 +138,14 @@ def load_data(*args, **kwargs):
         print('Finished downloading asset.')
 
     # Save items (if not done so already, making sure they are stored in OUTPUT['output_path']):
+    output_projection = OUTPUT['output_projection']
+    for item in all_futures:
+        if item.epsg_code == output_projection: 
+            print("True")
+        else
+            print("False")
+
+
 
     # Put all filenames of all assets into kwargs['image_prefixes']:
 
