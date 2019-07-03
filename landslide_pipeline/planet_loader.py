@@ -163,7 +163,7 @@ def reproject_assets(**kwargs):
     for item in kwargs['items']:
         if item['properties']['epsg_code'] == output_projection:
             print("True")
-        else
+        else:
             print("False")
 
 '''
