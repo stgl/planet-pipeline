@@ -28,7 +28,7 @@ TIMES = {'start': "2019-07-01T00:00:00Z",
 
 
 OUTPUT = {'output_path': 'wenchuan',
-          'output_projection': 3245}
+          'output_projection': 32610}
 
 CB_PERCENT = 5.0
 
