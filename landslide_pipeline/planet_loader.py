@@ -1,6 +1,6 @@
 
 def load_data(*args, **kwargs):
-    from landslide_pipeline.pipeline import LOCATION, TIMES, SATELLITE_INFO, OUTPUT
+    from landslide_pipeline.pipeline import LOCATION, TIMES, SATELLITE_INFO, OUTPUT, DEBUG
     import os
     import planet.api as api
     import requests
@@ -119,13 +119,12 @@ def load_data(*args, **kwargs):
                     time.sleep(30.0)
             asset = client.get_assets(item).get()[asset_type]
             callback = api.write_to_file(directory=output_directory, callback=None, overwrite=True)
-            body = client.download(asset, callback=callback)
-            body.await()
-            return True
+            name = client.download(asset, callback=callback).wait().name
+            return name, item
 
         if assets.get('visual', None) is not None:
             asset_futures += [executor.submit(activate_and_download_asset_type, 'visual')]
-        if assets.get('analytic', None) is not None:
+        if assets.get('analytic', None) is not None and not DEBUG:
             asset_futures += [executor.submit(activate_and_download_asset_type, 'analytic')]
 
         return asset_futures
@@ -133,22 +132,27 @@ def load_data(*args, **kwargs):
     for item_i in items.items_iter(250):
         all_futures += activate_and_download(item_i)
 
-    for _ in as_completed(all_futures):
-        print('Finished downloading asset.')
+    results = []
 
-    # Save items (if not done so already, making sure they are stored in OUTPUT['output_path']):
+    for result in as_completed(all_futures):
+        results += [result.result()]
+        print('Finished downloading asset.', result.result()[0])
 
     # Put all filenames of all assets into kwargs['image_prefixes']:
 
     this_args = {'start': TIMES['start'],
                  'end': TIMES['end'],
-                 'satellite': SATELLITE_INFO['satellite'],
+                 'satellite': SATELLITE_INFO,
                  'output_path': OUTPUT['output_path']}
-    #image_prefixes = downloads that i get from planet
-    #kwargs['image_prefixes'] = <List of strings with location of each downloaded image>
+    image_prefixes = []
+    items_list = []
+    for result in results:
+        image_prefixes += [result[0]]
+        items_list += [result[1]]
+    kwargs['image_prefixes'] = image_prefixes
+    kwargs['items'] = items_list
     kwargs.update(this_args)
-
-    return
+    return kwargs
 
 '''
     pr = get_paths_rows((LOCATION['min_longitude'], LOCATION['min_latitude']),

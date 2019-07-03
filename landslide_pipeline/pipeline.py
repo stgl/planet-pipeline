@@ -3,6 +3,8 @@
 # Python script to implement landslide mapping download and processing pipeline.
 import sys
 
+DEBUG = True
+
 '''
 LOCATION = {'min_latitude': 30.4,
             'min_longitude': 102.4,
@@ -21,8 +23,8 @@ LOCATION = {'min_latitude': 37.4146,
 
 #SATELLITE_INFO = {'satellite': 5}
 SATELLITE_INFO = ['PSOrthoTile', 'REOrthoTile']
-TIMES = {'start': "2019-06-16T00:00:00Z",
-         'end': "2019-06-20T00:00:00Z"}
+TIMES = {'start': "2019-07-01T00:00:00Z",
+         'end': "2019-07-01T18:59:00Z"}
 
 
 OUTPUT = {'output_path': 'wenchuan',
