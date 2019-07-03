@@ -1,9 +1,10 @@
 
-def load_data(*args, **kwargs):
+def load_data(**kwargs):
     from landslide_pipeline.pipeline import LOCATION, TIMES, SATELLITE_INFO, OUTPUT, DEBUG
     import os
     import planet.api as api
     import requests
+    from landslide_pipeline.pipeline import OUTPUT
 
     # Set up client:
 
@@ -154,30 +155,18 @@ def load_data(*args, **kwargs):
     kwargs.update(this_args)
     return kwargs
 
+def reproject_assets(**kwargs):
+
+    from landslide_pipeline.pipeline import OUTPUT
+    # Save items (if not done so already, making sure they are stored in OUTPUT['output_path']):
+    output_projection = OUTPUT['output_projection']
+    for item in kwargs['items']:
+        if item['properties']['epsg_code'] == output_projection:
+            print("True")
+        else
+            print("False")
+
 '''
-    pr = get_paths_rows((LOCATION['min_longitude'], LOCATION['min_latitude']),
-                        (LOCATION['max_longitude'], LOCATION['max_latitude']))
-    import glob
-    for (path, row) in pr:
-        this_args = {'row': str(row),
-                     'path': str(path),
-                     'start': TIMES['start'],
-                     'end': TIMES['end'],
-                     'satellite': SATELLITE_INFO['satellite'],
-                     'output_path': OUTPUT['output_path'] + '/P' + str(path) + 'R' + str(row)}
-
-        landsat_cli.main(this_args)
-
-    this_args.pop('row', None)
-    this_args.pop('path', None)
-    kwargs['image_prefixes'] = glob.glob(OUTPUT['output_path'] + '/*/*')
-    kwargs.update(this_args)
-    return kwargs 
-'''
-
-
-
-
 def rgb_scenes(*args, **kwargs):
     import glob
     import subprocess
@@ -206,3 +195,4 @@ def rgb_scenes(*args, **kwargs):
             else:
                 kwargs['scene_prefixes'] += [scene_prefix]
     return kwargs
+'''
