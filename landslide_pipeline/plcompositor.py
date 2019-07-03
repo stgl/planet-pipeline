@@ -4,7 +4,13 @@ def compositor(*args, **kwargs):
     import subprocess
     from landslide_pipeline.pipeline import OUTPUT
     import os
-    
+
+    # Check for planet data:
+
+    isPlanet = True if kwargs.get('items', None) is not None else False
+
+    if isPlanet:
+
     pathrow_dirs = glob.glob(OUTPUT['output_path'] + '/P*R*')
     for pathrow_dir in pathrow_dirs:
         scenes = glob.glob(pathrow_dir + '/*')

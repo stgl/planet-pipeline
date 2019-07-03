@@ -31,7 +31,7 @@ OUTPUT = {'output_path': 'wenchuan',
           'output_projection': 32610}
 
 CB_PERCENT = 5.0
-
+'''
 LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader download
                #'landslide_pipeline.landsat_loader.rgb_scenes',
                #'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
@@ -44,6 +44,23 @@ LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader 
                #'landslide_pipeline.tensorflow.export',
                'landslide_pipeline.tensorflow.classify',
                )
+
+'''
+
+LS_PIPELINE = ('landslide_pipeline.planet_loader.load_data', # planet data download
+               'landslide_pipeline.planet_loader.reproject_assets', # planet reprojection
+               #'landslide_pipeline.landsat_loader.rgb_scenes',
+#               'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
+               #'landslide_pipeline.mosaic.mosaic',
+               #'landslide_pipeline.color.correct',
+               #'landslide_pipeline.image_chips.create',
+               #'landslide_pipeline.image_chips.convert',
+               #'landslide_pipeline.tensorflow.chips_to_tfrecords',
+               #'landslide_pipeline.tensorflow.train',
+               #'landslide_pipeline.tensorflow.export',
+               #'landslide_pipeline.tensorflow.classify',
+               )
+
 
 STRETCH_STD = 2.0
 
@@ -84,3 +101,4 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
             return result
         out.update(result)
     return out
+

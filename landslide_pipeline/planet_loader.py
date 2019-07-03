@@ -1,5 +1,4 @@
-
-def load_data(**kwargs):
+def load_data(*args, **kwargs):
     from landslide_pipeline.pipeline import LOCATION, TIMES, SATELLITE_INFO, OUTPUT, DEBUG
     import os
     import planet.api as api
@@ -155,16 +154,25 @@ def load_data(**kwargs):
     kwargs.update(this_args)
     return kwargs
 
-def reproject_assets(**kwargs):
+def reproject_assets(*args, **kwargs):
 
     from landslide_pipeline.pipeline import OUTPUT
     # Save items (if not done so already, making sure they are stored in OUTPUT['output_path']):
     output_projection = OUTPUT['output_projection']
-    for item in kwargs['items']:
-        if item['properties']['epsg_code'] == output_projection:
-            print("True")
+    for (item, filename) in zip(kwargs['items'], kwargs['image_prefixes']):
+        import os
+        full_filename = os.path.join(OUTPUT['output_path'], filename)
+        if int(item['properties']['epsg_code']) != output_projection:
+            import subprocess as sp
+            arg = ['gdalwarp', '-s_srs', 'EPSG:' + str(item['properties']['epsg_code']), '-t_srs', 'EPSG:' + str(OUTPUT['output_projection']), full_filename, '/tmp/tmpreproj.tif']
+            sp.call(arg)
+            arg = ['rm', '-f', full_filename]
+            sp.call(arg)
+            arg = ['mv', '/tmp/tmpreproj.tif', full_filename]
+            sp.call(arg)
+            print('Reprojected: ', full_filename)
         else:
-            print("False")
+            print('Did not reproject: ', filename)
 
 '''
 def rgb_scenes(*args, **kwargs):
