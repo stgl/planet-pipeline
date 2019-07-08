@@ -3,21 +3,35 @@
 # Python script to implement landslide mapping download and processing pipeline.
 import sys
 
+DEBUG = True
 
+'''
 LOCATION = {'min_latitude': 30.4,
             'min_longitude': 102.4,
             'max_latitude': 32.8,
             'max_longitude': 105.1}
+'''
 
-TIMES = {'start': '2008-05-22',
-         'end': '2009-05-22'}
+LOCATION = {'min_latitude': 37.4146,
+            'min_longitude': -122.1834,
+            'max_latitude': 37.4383,
+            'max_longitude': -122.1561}
 
-SATELLITE_INFO = {'satellite': 5}
 
-OUTPUT = {'output_path': 'wenchuan'}
+#TIMES = {'start': '2008-05-22',
+#         'end': '2009-05-22'}
+
+#SATELLITE_INFO = {'satellite': 5}
+SATELLITE_INFO = ['PSOrthoTile', 'REOrthoTile']
+TIMES = {'start': "2019-07-01T00:00:00Z",
+         'end': "2019-07-01T18:59:00Z"}
+
+
+OUTPUT = {'output_path': 'wenchuan',
+          'output_projection': 32610}
 
 CB_PERCENT = 5.0
-
+'''
 LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader download
                #'landslide_pipeline.landsat_loader.rgb_scenes',
                #'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
@@ -30,6 +44,23 @@ LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader 
                #'landslide_pipeline.tensorflow.export',
                'landslide_pipeline.tensorflow.classify',
                )
+
+'''
+
+LS_PIPELINE = ('landslide_pipeline.planet_loader.load_data', # planet data download
+               'landslide_pipeline.planet_loader.reproject_assets', # planet reprojection
+               #'landslide_pipeline.landsat_loader.rgb_scenes',
+               'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
+               #'landslide_pipeline.mosaic.mosaic',
+               #'landslide_pipeline.color.correct',
+               #'landslide_pipeline.image_chips.create',
+               #'landslide_pipeline.image_chips.convert',
+               #'landslide_pipeline.tensorflow.chips_to_tfrecords',
+               #'landslide_pipeline.tensorflow.train',
+               #'landslide_pipeline.tensorflow.export',
+               #'landslide_pipeline.tensorflow.classify',
+               )
+
 
 STRETCH_STD = 2.0
 
@@ -70,3 +101,4 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
             return result
         out.update(result)
     return out
+
