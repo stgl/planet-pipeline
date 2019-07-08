@@ -174,6 +174,8 @@ def reproject_assets(*args, **kwargs):
         else:
             print('Did not reproject: ', filename)
 
+    return kwargs
+
 '''
 def rgb_scenes(*args, **kwargs):
     import glob

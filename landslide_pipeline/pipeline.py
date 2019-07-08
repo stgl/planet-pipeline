@@ -50,7 +50,7 @@ LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader 
 LS_PIPELINE = ('landslide_pipeline.planet_loader.load_data', # planet data download
                'landslide_pipeline.planet_loader.reproject_assets', # planet reprojection
                #'landslide_pipeline.landsat_loader.rgb_scenes',
-#               'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
+               'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
                #'landslide_pipeline.mosaic.mosaic',
                #'landslide_pipeline.color.correct',
                #'landslide_pipeline.image_chips.create',
