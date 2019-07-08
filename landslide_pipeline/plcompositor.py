@@ -27,15 +27,25 @@ def compositor(*args, **kwargs):
             for index in range(compositor_index):
                 arg += ['-i', '/tmp/visual_' + str(index) + '.tif']
             subprocess.call(arg)
+            for index in range(compositor_index):
+                os.remove('/tmp/visual_' + str(index) + '.tif')
         if len(analytic_filenames) > 0:
             output_name = os.path.join(OUTPUT['output_path'], OUTPUT['output_path'] + "_Analytic.tif")
             arg = ['gdal_merge.py', '-o', output_name, '-createonly', '-of', 'GTiff', '-co',
                    'COMPRESS=LZW'] + analytic_filenames
             subprocess.call(arg)
+            compositor_index = 0
+            for visual_filename in visual_filenames:
+                arg = ['gdal_merge.py', '-o', '/tmp/analytic_' + str(compositor_index) + '.tif', '-of', 'GTiff', '-co',
+                       'COMPRESS=LZW', output_name, visual_filename]
+                subprocess.call(arg)
+                compositor_index += 1
             arg = ['compositor', '-q', '-o', output_name]
-            for analytic_filename in analytic_filenames:
-                arg += ['-i', analytic_filename]
+            for index in range(compositor_index):
+                arg += ['-i', '/tmp/analytic_' + str(index) + '.tif']
             subprocess.call(arg)
+            for index in range(compositor_index):
+                os.remove('/tmp/analytic_' + str(index) + '.tif')
     else:
         pathrow_dirs = glob.glob(OUTPUT['output_path'] + '/P*R*')
         for pathrow_dir in pathrow_dirs:
