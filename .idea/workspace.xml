@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdb844d0-1184-45b5-bd8d-b8dc9e3949bf" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/landslide_pipeline/pipeline.py" beforeDir="false" afterPath="$PROJECT_DIR$/landslide_pipeline/pipeline.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/landslide_pipeline/planet_loader.py" beforeDir="false" afterPath="$PROJECT_DIR$/landslide_pipeline/planet_loader.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/landslide_pipeline/plcompositor.py" beforeDir="false" afterPath="$PROJECT_DIR$/landslide_pipeline/plcompositor.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/landslide_pipeline/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/landslide_pipeline/utils.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,56 +12,14 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/landslide_pipeline/pipeline.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="619">
-              <caret line="104" selection-start-line="104" selection-end-line="104" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/landslide_pipeline/mosaic.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" column="4" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/landslide_pipeline/plcompositor.py">
+        <entry file="file://$PROJECT_DIR$/landslide_pipeline/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="555">
-              <caret line="37" column="12" selection-start-line="37" selection-start-column="12" selection-end-line="37" selection-end-column="12" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/landslide_pipeline/image_chips.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="11" selection-start-line="11" selection-end-line="11" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/.conda/envs/landslide/lib/python3.7/http/client.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4305">
-              <caret line="294" selection-start-line="294" selection-end-line="294" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/landslide_pipeline/planet_loader.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="424">
-              <caret line="176" column="17" selection-start-line="176" selection-start-column="17" selection-end-line="176" selection-end-column="17" />
+            <state relative-caret-position="589">
+              <caret line="87" column="17" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="17" />
+              <folding>
+                <element signature="e#2394#2404#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -89,11 +44,12 @@
         <option value="$PROJECT_DIR$/landslide_pipeline/pipeline.py" />
         <option value="$PROJECT_DIR$/landslide_pipeline/planet_loader.py" />
         <option value="$PROJECT_DIR$/landslide_pipeline/plcompositor.py" />
+        <option value="$PROJECT_DIR$/landslide_pipeline/utils.py" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="194" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="126" />
     <option name="y" value="27" />
     <option name="width" value="1400" />
     <option name="height" value="1000" />
@@ -103,6 +59,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -119,7 +76,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -152,9 +108,9 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="67" y="25" width="1853" height="1175" extended-state="7" />
+    <frame x="67" y="25" width="1853" height="1175" extended-state="6" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.18797815" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18797815" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -197,13 +153,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/landslide_pipeline/mosaic.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" column="4" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/landslide_pipeline/image_chips.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
@@ -218,6 +167,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/landslide_pipeline/planet_loader.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2640">
+          <caret line="176" column="17" selection-start-line="176" selection-start-column="17" selection-end-line="176" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/landslide_pipeline/plcompositor.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="17" column="9" lean-forward="true" selection-start-line="17" selection-start-column="9" selection-end-line="17" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/landslide_pipeline/mosaic.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="4" selection-start-line="6" selection-start-column="4" selection-end-line="6" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/landslide_pipeline/pipeline.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="619">
@@ -225,17 +195,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/landslide_pipeline/planet_loader.py">
+    <entry file="file://$PROJECT_DIR$/landslide_pipeline/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="424">
-          <caret line="176" column="17" selection-start-line="176" selection-start-column="17" selection-end-line="176" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/landslide_pipeline/plcompositor.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="37" column="12" selection-start-line="37" selection-start-column="12" selection-end-line="37" selection-end-column="12" />
+        <state relative-caret-position="589">
+          <caret line="87" column="17" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="17" />
+          <folding>
+            <element signature="e#2394#2404#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
