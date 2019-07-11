@@ -53,14 +53,16 @@ LS_PIPELINE = ('landslide_pipeline.planet_loader.load_data', # planet data downl
                'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
                #'landslide_pipeline.mosaic.mosaic',
                #'landslide_pipeline.color.correct',
-               #'landslide_pipeline.image_chips.create',
-               #'landslide_pipeline.image_chips.convert',
+               'landslide_pipeline.image_chips.create',
+               'landslide_pipeline.image_chips.convert',
+               'landslide_pipeline.image_chips.resample',
                #'landslide_pipeline.tensorflow.chips_to_tfrecords',
                #'landslide_pipeline.tensorflow.train',
                #'landslide_pipeline.tensorflow.export',
                #'landslide_pipeline.tensorflow.classify',
                )
 
+MAX_CHIP_DIMENSION = 100
 
 STRETCH_STD = 2.0
 

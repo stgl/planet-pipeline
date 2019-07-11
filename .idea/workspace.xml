@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="cdb844d0-1184-45b5-bd8d-b8dc9e3949bf" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/landslide_pipeline/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/landslide_pipeline/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/landslide_pipeline/image_chips.py" beforeDir="false" afterPath="$PROJECT_DIR$/landslide_pipeline/image_chips.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/landslide_pipeline/pipeline.py" beforeDir="false" afterPath="$PROJECT_DIR$/landslide_pipeline/pipeline.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -13,13 +14,31 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/landslide_pipeline/pipeline.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="57" column="57" selection-start-line="57" selection-start-column="57" selection-end-line="57" selection-end-column="57" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/landslide_pipeline/utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="589">
-              <caret line="87" column="17" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="17" />
+            <state relative-caret-position="49">
+              <caret line="145" column="70" selection-start-line="145" selection-start-column="70" selection-end-line="145" selection-end-column="70" />
               <folding>
                 <element signature="e#2394#2404#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/landslide_pipeline/image_chips.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="885">
+              <caret line="92" column="17" selection-start-line="92" selection-start-column="17" selection-end-line="92" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -41,10 +60,11 @@
       <list>
         <option value="$USER_HOME$/planet-client-python/planet/api/__init__.py" />
         <option value="$PROJECT_DIR$/landslide_pipeline/mosaic.py" />
-        <option value="$PROJECT_DIR$/landslide_pipeline/pipeline.py" />
         <option value="$PROJECT_DIR$/landslide_pipeline/planet_loader.py" />
         <option value="$PROJECT_DIR$/landslide_pipeline/plcompositor.py" />
         <option value="$PROJECT_DIR$/landslide_pipeline/utils.py" />
+        <option value="$PROJECT_DIR$/landslide_pipeline/image_chips.py" />
+        <option value="$PROJECT_DIR$/landslide_pipeline/pipeline.py" />
       </list>
     </option>
   </component>
@@ -109,8 +129,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1175" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.18797815" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.18797815" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -122,7 +143,7 @@
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Version Control" order="7" weight="0.32891566" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32891566" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="9" sideWeight="0.4992785" visible="true" weight="0.3298279" />
+      <window_info anchor="bottom" id="Python Console" order="9" sideWeight="0.4992785" visible="true" weight="0.3298279" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5007215" side_tool="true" weight="0.24096386" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -150,13 +171,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="435">
           <caret line="35" column="19" selection-start-line="35" selection-start-column="8" selection-end-line="35" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/landslide_pipeline/image_chips.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" selection-start-line="11" selection-end-line="11" />
         </state>
       </provider>
     </entry>
@@ -188,20 +202,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/landslide_pipeline/pipeline.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="619">
-          <caret line="104" selection-start-line="104" selection-end-line="104" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/landslide_pipeline/utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="589">
-          <caret line="87" column="17" selection-start-line="87" selection-start-column="17" selection-end-line="87" selection-end-column="17" />
+        <state relative-caret-position="49">
+          <caret line="145" column="70" selection-start-line="145" selection-start-column="70" selection-end-line="145" selection-end-column="70" />
           <folding>
             <element signature="e#2394#2404#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/landslide_pipeline/image_chips.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="885">
+          <caret line="92" column="17" selection-start-line="92" selection-start-column="17" selection-end-line="92" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/landslide_pipeline/pipeline.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="57" column="57" selection-start-line="57" selection-start-column="57" selection-end-line="57" selection-end-column="57" />
         </state>
       </provider>
     </entry>
