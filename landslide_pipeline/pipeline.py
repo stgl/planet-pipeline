@@ -19,9 +19,10 @@ LOCATION = {'min_latitude': 37.4146,
 
 
 SATELLITE_INFO = ['PSOrthoTile', 'REOrthoTile']
-TIMES = {'start': "2019-07-01T00:00:00Z",
+TIMES = {'start': "2019-06-01T00:00:00Z",
          'end': "2019-07-01T18:59:00Z"}
 
+MAX_ACQUISITIONS = 10
 
 OUTPUT = {'output_path': 'wenchuan',
           'output_projection': 32610}

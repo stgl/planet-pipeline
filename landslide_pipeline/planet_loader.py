@@ -87,8 +87,9 @@ def load_data(*args, **kwargs):
     except:
         pass
 
+    from landslide_pipeline.pipeline import MAX_ACQUISITIONS
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    executor = ThreadPoolExecutor(5)
+    executor = ThreadPoolExecutor(max_workers = MAX_ACQUISITIONS)
 
     all_futures = []
 
@@ -129,8 +130,15 @@ def load_data(*args, **kwargs):
 
         return asset_futures
 
-    for item_i in items.items_iter(250):
+    import numpy as np
+
+    potential_items_to_download = [item_i for item_i in items.items_iter(250)]
+    items_to_download = [potential_items_to_download[x] for x in np.random.choice(len(potential_items_to_download), MAX_ACQUISITIONS, replace=False)] if len(potential_items_to_download) > MAX_ACQUISITIONS else potential_items_to_download
+
+    for item_i in items_to_download:
         all_futures += activate_and_download(item_i)
+
+    print('Activating and downloading ' + str(len(items_to_download)) + ' items.')
 
     results = []
 
