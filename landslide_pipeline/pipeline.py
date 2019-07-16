@@ -25,7 +25,7 @@ TIMES = {'start': "2019-06-01T00:00:00Z",
 MAX_ACQUISITIONS = 10
 
 OUTPUT = {'output_path': 'wenchuan',
-          'output_projection': 32610}
+          'output_projection': 32648}
 
 CB_PERCENT = 5.0
 '''
