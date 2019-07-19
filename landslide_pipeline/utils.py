@@ -119,9 +119,6 @@ def simplest_cb(img, percent):
         low_val  = flat[int(math.floor(n_cols * half_percent))]
         high_val = flat[int(math.ceil( n_cols * (1.0 - half_percent)))]
 
-        print "Lowval: ", low_val
-        print "Highval: ", high_val
-
         # saturate below the low percentile and above the high percentile
         thresholded = apply_threshold(channel, low_val, high_val)
         # scale the channel
@@ -162,8 +159,9 @@ def get_path_row(lat, lon):
     
     return (p, r)
            
-def get_paths_rows((min_lon, min_lat), (max_lon, max_lat)):
-        
+def get_paths_rows(min, max):
+    (min_lon, min_lat) = min
+    (max_lon, max_lat) = max
     pr = []
     for x in np.arange(min_lon, max_lon, 0.3):
         for y in np.arange(min_lat, max_lat, 0.3):
@@ -172,4 +170,8 @@ def get_paths_rows((min_lon, min_lat), (max_lon, max_lat)):
     return set(pr)
 
            
-    
+def resample_image(image, max_dim_size = 100):
+
+    aspect_ratio = image.size[1] / image.size[0]
+    return image.resize((int(round(float(max_dim_size)/aspect_ratio)),max_dim_size)) if aspect_ratio >= 1 \
+        else image.resize((max_dim_size, int(round(float(max_dim_size)*aspect_ratio))))
