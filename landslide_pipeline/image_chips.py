@@ -73,6 +73,22 @@ def convert(*args, **kwargs):
         chip_output = chip.replace('.TIF','.png')
         subprocess.call(['convert', chip, chip_output]);
         os.remove(chip)
+
+    return kwargs
     
-    
-    
+def resample(*args, **kwargs):
+
+    from landslide_pipeline.pipeline import MAX_CHIP_DIMENSION
+    from landslide_pipeline.utils import resample_image
+    import glob
+    from PIL import Image
+
+    chips = glob.glob('image_chips/*.png')
+
+    for chip in chips:
+        image = Image.open(chip)
+        image = resample_image(image, max_dim_size=MAX_CHIP_DIMENSION)
+        image.save(chip)
+
+    return kwargs
+
