@@ -1,4 +1,8 @@
 def load_data(*args, **kwargs):
+
+    if kwargs.get('image_prefixes', None) is not None and kwargs.get('items', None) is not None:
+        return kwargs
+
     from landslide_pipeline.pipeline import LOCATION, TIMES, SATELLITE_INFO, OUTPUT, DEBUG
     import os
     import planet.api as api
@@ -87,8 +91,9 @@ def load_data(*args, **kwargs):
     except:
         pass
 
+    from landslide_pipeline.pipeline import MAX_ACQUISITIONS
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    executor = ThreadPoolExecutor(5)
+    executor = ThreadPoolExecutor(max_workers = MAX_ACQUISITIONS)
 
     all_futures = []
 
@@ -129,8 +134,15 @@ def load_data(*args, **kwargs):
 
         return asset_futures
 
-    for item_i in items.items_iter(250):
+    import numpy as np
+
+    potential_items_to_download = [item_i for item_i in items.items_iter(250)]
+    items_to_download = [potential_items_to_download[x] for x in np.random.choice(len(potential_items_to_download), MAX_ACQUISITIONS, replace=False)] if len(potential_items_to_download) > MAX_ACQUISITIONS else potential_items_to_download
+
+    for item_i in items_to_download:
         all_futures += activate_and_download(item_i)
+
+    print('Activating and downloading ' + str(len(items_to_download)) + ' items.')
 
     results = []
 
@@ -176,33 +188,3 @@ def reproject_assets(*args, **kwargs):
 
     return kwargs
 
-'''
-def rgb_scenes(*args, **kwargs):
-    import glob
-    import subprocess
-    from landslide_pipeline.pipeline import OUTPUT
-
-    pathrow_dirs = glob.glob(OUTPUT['output_path'] + '/P*R*')
-
-    for pathrow_dir in pathrow_dirs:
-        scenes = glob.glob(pathrow_dir + '/*')
-        band1_filenames = glob.glob(pathrow_dir + '/*/*_B1.TIF')
-        from utils import extent_union_of_files
-        union = extent_union_of_files(band1_filenames)
-
-        for scene in scenes:
-            arg = ['gdal_merge.py']
-            scene_prefix = glob.glob(scene + '/*_B1.TIF')[0].replace('_B1.TIF', '')
-            output_filename = scene_prefix + '_RGB.TIF'
-            arg = arg + ['-o', output_filename, '-co', 'PHOTOMETRIC=RGB', '-separate', '-ul_lr', str(union['xmin']),
-                         str(union['ymax']), str(union['xmax']), str(union['ymin']), (scene_prefix + '_B3.TIF'),
-                         (scene_prefix + '_B2.TIF'), (scene_prefix + '_B1.TIF')]
-            import os.path
-            if not os.path.isfile(output_filename):
-                subprocess.call(arg)
-            if kwargs.get('scene_prefixes') is None:
-                kwargs['scene_prefixes'] = [scene_prefix]
-            else:
-                kwargs['scene_prefixes'] += [scene_prefix]
-    return kwargs
-'''

@@ -5,30 +5,27 @@ import sys
 
 DEBUG = True
 
-'''
 LOCATION = {'min_latitude': 30.4,
             'min_longitude': 102.4,
             'max_latitude': 32.8,
             'max_longitude': 105.1}
-'''
 
+'''
 LOCATION = {'min_latitude': 37.4146,
             'min_longitude': -122.1834,
             'max_latitude': 37.4383,
             'max_longitude': -122.1561}
+'''
 
 
-#TIMES = {'start': '2008-05-22',
-#         'end': '2009-05-22'}
-
-#SATELLITE_INFO = {'satellite': 5}
 SATELLITE_INFO = ['PSOrthoTile', 'REOrthoTile']
-TIMES = {'start': "2019-07-01T00:00:00Z",
+TIMES = {'start': "2019-06-01T00:00:00Z",
          'end': "2019-07-01T18:59:00Z"}
 
+MAX_ACQUISITIONS = 10
 
 OUTPUT = {'output_path': 'wenchuan',
-          'output_projection': 32610}
+          'output_projection': 32648}
 
 CB_PERCENT = 5.0
 '''
@@ -47,9 +44,10 @@ LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader 
 
 '''
 
-LS_PIPELINE = ('landslide_pipeline.planet_loader.load_data', # planet data download
+LS_PIPELINE = ('landslide_pipeline.io.load_pipeline', 
+               'landslide_pipeline.planet_loader.load_data', # planet data download
                'landslide_pipeline.planet_loader.reproject_assets', # planet reprojection
-               #'landslide_pipeline.landsat_loader.rgb_scenes',
+               'landslide_pipeline.io.save_pipeline',
                'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
                #'landslide_pipeline.mosaic.mosaic',
                #'landslide_pipeline.color.correct',

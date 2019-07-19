@@ -4,6 +4,9 @@ def compositor(*args, **kwargs):
     import subprocess
     from landslide_pipeline.pipeline import OUTPUT
     import os
+    
+    if kwargs.get('cloudless_scenes', None) is not None:
+        return kwargs
 
     # Check for planet data:
 
@@ -12,6 +15,7 @@ def compositor(*args, **kwargs):
     if is_planet:
         visual_filenames = [os.path.join(OUTPUT['output_path'], prefix) for prefix in kwargs.get('image_prefixes') if "Visual" in prefix]
         analytic_filenames = [os.path.join(OUTPUT['output_path'], prefix) for prefix in kwargs.get('image_prefixes') if "Analytic" in prefix]
+        kwargs['cloudless_scenes'] = {}
         if len(visual_filenames) > 0:
             output_name = os.path.join(OUTPUT['output_path'],OUTPUT['output_path'] + "_Visual.tif")
             arg = ['gdal_merge.py', '-o', output_name, '-createonly', '-of', 'GTiff', '-co',
@@ -29,6 +33,7 @@ def compositor(*args, **kwargs):
             subprocess.call(arg)
             for index in range(compositor_index):
                 os.remove('/tmp/visual_' + str(index) + '.tif')
+            kwargs['cloudless_scenes']['visual'] = OUTPUT['output_path'] + '_Visual.tif'
         if len(analytic_filenames) > 0:
             output_name = os.path.join(OUTPUT['output_path'], OUTPUT['output_path'] + "_Analytic.tif")
             arg = ['gdal_merge.py', '-o', output_name, '-createonly', '-of', 'GTiff', '-co',
@@ -46,6 +51,7 @@ def compositor(*args, **kwargs):
             subprocess.call(arg)
             for index in range(compositor_index):
                 os.remove('/tmp/analytic_' + str(index) + '.tif')
+            kwargs['cloudless_scenes']['analytic'] = OUTPUT['output_path'] + '_Analytic.tif' 
     else:
         pathrow_dirs = glob.glob(OUTPUT['output_path'] + '/P*R*')
         for pathrow_dir in pathrow_dirs:
@@ -61,7 +67,7 @@ def compositor(*args, **kwargs):
     
             subprocess.call(arg)
     
-            if kwargs.get('cloudless_scene', None) is None:
+            if kwargs.get('cloudless_scenes', None) is None:
                 kwargs['cloudless_scenes'] = [pathrow_dir + '/' + os.path.basename(pathrow_dir) + '.TIF']
             else:
                 kwargs['cloudless_scenes'] += [pathrow_dir + '/' + os.path.basename(pathrow_dir) + '.TIF']
