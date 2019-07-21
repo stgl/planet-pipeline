@@ -135,8 +135,8 @@ def reproject_assets(**kwargs):
         if cloudless_scene['coordinate_system'] != output_projection:
             import subprocess as sp
             arg = ['gdalwarp', '-s_srs', 'EPSG:' + str(cloudless_scene['coordinate_system']), \
-                   '-t_srs', 'EPSG:' + str(OUTPUT['output_projection']), cloudless_scene['filename'], \
-                   '/tmp/tmpreproj.tif']
+                   '-t_srs', 'EPSG:' + str(OUTPUT['output_projection']), '-of', 'GTiff', '-co', 'COMPRESS-LZW', \
+                   '-co', 'BIGTIFF=IF_SAFER', cloudless_scene['filename'], '/tmp/tmpreproj.tif']
             sp.call(arg)
             arg = ['rm', '-f', cloudless_scene['filename']]
             sp.call(arg)
