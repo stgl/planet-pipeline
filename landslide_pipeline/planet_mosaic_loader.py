@@ -26,7 +26,7 @@ def query_planet_mosaic():
             else:
                 id = items['id']
                 quad_ids = []
-                r = requests.get('https://api.planet.com/mosaic/experimental/mosaics/' + str(id) + '/quads?bbox=' + str(ul[0])+'%2C'+str(lr[1])+'%2C'+str(lr[0])+'%2C'+str(ul[1]),auth=(PL_API_KEY,''))
+                r = requests.get('https://api.planet.com/basemaps/v1/mosaics/' + str(id) + '/quads?bbox=' + str(ul[0])+'%2C'+str(lr[1])+'%2C'+str(lr[0])+'%2C'+str(ul[1]),auth=(PL_API_KEY,''))
                 resp = r.json()
                 if len(resp['items']) > 0:
                     time_range = DateTimeRange(items['first_acquired'].split('T')[0], items['last_acquired'].split('T')[0])
