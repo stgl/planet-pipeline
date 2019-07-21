@@ -85,7 +85,7 @@ def load_data(**kwargs):
         os.mkdir(output_directory)
     except:
         pass
-    
+
 
     metadata = query_planet_mosaic()
 
@@ -114,7 +114,8 @@ def load_data(**kwargs):
                               "coordinate_system": mosaic['coordinate_system']}]
 
         arg = ['gdal_merge.py', '-o', output_name, '-of', 'GTiff', '-co',
-               'COMPRESS=LZW', '-ul_lr', str(ulp[0]), str(ulp[1]), str(lrp[0]), str(lrp[1])] + tilenames
+               'COMPRESS=LZW', '-co', 'BIGTIFF=IF_SAFER', '-ul_lr', str(ulp[0]), str(ulp[1]), str(lrp[0]),
+               str(lrp[1])] + tilenames
 
         import subprocess
         subprocess.call(arg)
