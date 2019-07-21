@@ -25,15 +25,26 @@ def query_planet_mosaic():
                 pass
             else:
                 id = items['id']
+                quad_ids = []
                 r = requests.get('https://api.planet.com/mosaic/experimental/mosaics/' + str(id) + '/quads?bbox=' + str(ul[0])+'%2C'+str(lr[1])+'%2C'+str(lr[0])+'%2C'+str(ul[1]),auth=(PL_API_KEY,''))
                 resp = r.json()
                 if len(resp['items']) > 0:
                     time_range = DateTimeRange(items['first_acquired'].split('T')[0], items['last_acquired'].split('T')[0])
                     x = DateTimeRange(start, end)
                     if time_range.is_intersection(x) is True:
+                        quad_ids += [it['id'] for it in resp['items']]
+                        while resp['_links'].get('_next') is not None:
+                            r = requests.get(resp['_links'].get('_next'))
+                            resp = r.json()
+                            time_range = DateTimeRange(items['first_acquired'].split('T')[0],
+                                                       items['last_acquired'].split('T')[0])
+                            x = DateTimeRange(start, end)
+                            if time_range.is_intersection(x) is True:
+                                quad_ids += [it['id'] for it in resp['items']]
+                    if len(quad_ids) > 0:
                         return_items += [{"name": str(items['name']),
                                           "mosaic_id": str(items['id']),
-                                          "quad_ids": tuple(set([it['id'] for it in resp['items']])),
+                                          "quad_ids": tuple(set(quad_ids)),
                                           "first_acquired": str(items['first_acquired']).split('T')[0],
                                           "last_acquired": str(items['last_acquired']).split('T')[0],
                                           "coordinate_system": int(items['coordinate_system'].split(':')[1]),
