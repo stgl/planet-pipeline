@@ -1,5 +1,5 @@
 {
-  "MAX_CHIP_DIMENSION": 150,
+  "MAX_CHIP_DIMENSION": 200,
   "LANDSLIDE_MAP": {
     "minimum_area": 25000,
     "area_field": "AREA",
@@ -13,11 +13,5 @@
   "TIMES": {
     "start": "2019-06-01T00:00:00",
     "end": "2019-07-01T18:59:00"
-  },
-  "LOCATION": {
-    "min_latitude": 30.4,
-    "min_longitude": 102.4,
-    "max_latitude": 32.8,
-    "max_longitude": 105.1
   }
 }

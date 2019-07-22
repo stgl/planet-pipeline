@@ -4,7 +4,6 @@ def create(**kwargs):
         return kwargs
 
     import os, ogr, subprocess
-    from osgeo import gdal
 
     cloudless_scenes = kwargs['cloudless_scenes']
     output = kwargs['OUTPUT']
@@ -16,7 +15,6 @@ def create(**kwargs):
     subprocess.call(['ogr2ogr', '-s_srs', os.path.join(map_name, map_name + '.prj'), '-t_srs', 'EPSG:' +
                      str(output['output_projection']), reprojected_map, os.path.join(map_name, map_name + '.shp')])
 
-    raster_dss = [gdal.Open(cloudless_scene) for cloudless_scene in cloudless_scenes]
     if not os.path.isdir('image_chips'):
         os.mkdir('image_chips')
 

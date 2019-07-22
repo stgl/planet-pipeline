@@ -2,7 +2,8 @@
 #
 # Python script to implement landslide mapping download and processing pipeline.
 
-LS_PIPELINE = ('landslide_pipeline.planet_mosaic_loader.load_data', # planet data download
+LS_PIPELINE = ('landslide_pipeline.utils.set_extent_from_landslide_map',
+               'landslide_pipeline.planet_mosaic_loader.load_data', # planet data download
                'landslide_pipeline.planet_mosaic_loader.reproject_assets', # planet reprojection
                'landslide_pipeline.image_chips.create',
                #'landslide_pipeline.image_chips.convert',
