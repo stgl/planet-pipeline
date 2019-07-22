@@ -6,11 +6,8 @@ import requests
 from datetimerange import DateTimeRange
 from functools import partial
 
-PL_API_KEY = "58613e03d31d4476ae132fbe8bd0afca"
-os.environ["PL_API_KEY"] = PL_API_KEY
 
-
-def query_planet_mosaic():
+def query_planet_mosaic(location, times, api_key):
 
     def handle_page(response, ul, lr, start, end):
         return_items = []
@@ -26,10 +23,13 @@ def query_planet_mosaic():
             else:
                 id = items['id']
                 quad_ids = []
-                r = requests.get('https://api.planet.com/basemaps/v1/mosaics/' + str(id) + '/quads?bbox=' + str(ul[0])+'%2C'+str(lr[1])+'%2C'+str(lr[0])+'%2C'+str(ul[1]),auth=(PL_API_KEY,''))
+                r = requests.get('https://api.planet.com/basemaps/v1/mosaics/' + str(id) + '/quads?bbox=' +
+                                 str(ul[0])+'%2C'+str(lr[1])+'%2C'+str(lr[0])+'%2C'+str(ul[1]) +
+                                 '&api_key=' + api_key)
                 resp = r.json()
                 if len(resp['items']) > 0:
-                    time_range = DateTimeRange(items['first_acquired'].split('T')[0], items['last_acquired'].split('T')[0])
+                    time_range = DateTimeRange(items['first_acquired'].split('T')[0],
+                                               items['last_acquired'].split('T')[0])
                     x = DateTimeRange(start, end)
                     if time_range.is_intersection(x) is True:
                         quad_ids += [it['id'] for it in resp['items']]
@@ -53,11 +53,11 @@ def query_planet_mosaic():
 
     def metadata(ul, lr, start, end):
 
-        r = requests.get('https://api.planet.com/basemaps/v1/mosaics', auth=(PL_API_KEY, ''))
+        r = requests.get('https://api.planet.com/basemaps/v1/mosaics?api_key=' + api_key)
         response = r.json()
         final_list = []
         try:
-            if response['mosaics'][0]['quad_download'] ==True:
+            if response['mosaics'][0]['quad_download']:
                 final_list += handle_page(response, ul, lr, start, end)
         except KeyError:
             print('No Download permission for: '+str(response['mosaics'][0]['name']))
@@ -67,7 +67,7 @@ def query_planet_mosaic():
                 r = requests.get(page_url)
                 response = r.json()
                 try:
-                    if response['mosaics'][0]['quad_download'] ==True:
+                    if response['mosaics'][0]['quad_download']:
                         final_list += handle_page(response, ul, lr, start, end)
                 except KeyError:
                     print('No Download permission for: '+str(response['mosaics'][0]['name']))
@@ -76,36 +76,43 @@ def query_planet_mosaic():
 
         return final_list
 
-    from landslide_pipeline.pipeline import LOCATION, TIMES
-    ul = (LOCATION['min_longitude'], LOCATION['max_latitude'])
-    lr = (LOCATION['max_longitude'], LOCATION['min_latitude'])
-    start = TIMES['start']
-    end = TIMES['end']
+    ul = (location['min_longitude'], location['max_latitude'])
+    lr = (location['max_longitude'], location['min_latitude'])
+    start = times['start']
+    end = times['end']
 
     return metadata(ul, lr, start, end)
 
+
 def load_data(**kwargs):
 
-    from landslide_pipeline.pipeline import LOCATION, OUTPUT
+    if kwargs.get('cloudless_scenes') is not None:
+        return kwargs
+
+    location = kwargs['LOCATION']
+    times = kwargs['TIMES']
+    output = kwargs['OUTPUT']
+    api_key = kwargs['PL_API_KEY']
+
     import os
 
     cloudless_scenes = []
 
-    output_directory = os.path.join(os.getcwd(), OUTPUT['output_path'])
+    output_directory = os.path.join(os.getcwd(), output['output_path'])
     try:
         os.mkdir(output_directory)
     except:
         pass
 
-
-    metadata = query_planet_mosaic()
+    metadata = query_planet_mosaic(location, times, api_key)
+    kwargs['query_metadata'] = metadata
 
     for mosaic in metadata:
         tilenames = []
         counter = 0
         for tile in mosaic['quad_ids']:
             url = "https://api.planet.com/basemaps/v1/mosaics/" + mosaic['mosaic_id'] + '/quads/' + tile \
-                + '/full?api_key=' + PL_API_KEY
+                + '/full?api_key=' + api_key
             r = requests.get(url)
 
             tilename = '/tmp/' + str(counter)
@@ -114,13 +121,13 @@ def load_data(**kwargs):
             with open(tilename, 'wb') as f:
                 f.write(r.content)
 
-        ul = (LOCATION['max_latitude'], LOCATION['min_longitude'])
-        lr = (LOCATION['min_latitude'], LOCATION['max_longitude'])
+        ul = (location['max_latitude'], location['min_longitude'])
+        lr = (location['min_latitude'], location['max_longitude'])
 
         from landslide_pipeline.utils import get_projected_bounds
 
         (ulp, lrp) = get_projected_bounds(ul, lr, 4326, mosaic['coordinate_system'])
-        output_name = os.path.join(OUTPUT['output_path'], mosaic['name'] + '.tif')
+        output_name = os.path.join(output['output_path'], mosaic['name'] + '.tif')
         cloudless_scenes += [{"filename": output_name,
                               "coordinate_system": mosaic['coordinate_system']}]
 
@@ -139,14 +146,17 @@ def load_data(**kwargs):
 
 def reproject_assets(**kwargs):
 
-    from landslide_pipeline.pipeline import OUTPUT
+    if kwargs.get('reprojected') is not None:
+        return kwargs
+
+    output = kwargs['OUTPUT']
     cloudless_scenes = kwargs['cloudless_scenes']
-    output_projection = OUTPUT['output_projection']
+    output_projection = output['output_projection']
     for cloudless_scene in cloudless_scenes:
         if cloudless_scene['coordinate_system'] != output_projection:
             import subprocess as sp
-            arg = ['gdalwarp', '-s_srs', 'EPSG:' + str(cloudless_scene['coordinate_system']), \
-                   '-t_srs', 'EPSG:' + str(OUTPUT['output_projection']), '-of', 'GTiff', '-co', 'COMPRESS=LZW', \
+            arg = ['gdalwarp', '-s_srs', 'EPSG:' + str(cloudless_scene['coordinate_system']),
+                   '-t_srs', 'EPSG:' + str(output['output_projection']), '-of', 'GTiff', '-co', 'COMPRESS=LZW',
                    '-co', 'BIGTIFF=IF_SAFER', cloudless_scene['filename'], '/tmp/tmpreproj.tif']
             sp.call(arg)
             arg = ['rm', '-f', cloudless_scene['filename']]
@@ -156,5 +166,7 @@ def reproject_assets(**kwargs):
             print('Reprojected: ', cloudless_scene['filename'])
         else:
             print('Did not reproject: ', cloudless_scene['filename'])
+
+    kwargs['reprojected'] = True
 
     return kwargs
