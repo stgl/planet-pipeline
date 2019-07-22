@@ -230,7 +230,9 @@ def set_extent_from_landslide_map(**kwargs):
     epsg_code = 4326
 
     (min_y, max_y, min_x, max_x) = get_map_bounds_in_projection(map_name, epsg_code)
-    return {'max_longitude': max_x,
-            'min_longitude': min_x,
-            'min_latitude': min_y,
-            'max_latitude': max_y}
+
+    kwargs['LOCATION'] = {'max_longitude': max_x,
+                          'min_longitude': min_x,
+                          'min_latitude': min_y,
+                          'max_latitude': max_y}
+    return kwargs
