@@ -175,3 +175,25 @@ def resample_image(image, max_dim_size = 100):
     aspect_ratio = image.size[1] / image.size[0]
     return image.resize((int(round(float(max_dim_size)/aspect_ratio)),max_dim_size)) if aspect_ratio >= 1 \
         else image.resize((max_dim_size, int(round(float(max_dim_size)*aspect_ratio))))
+
+
+def get_projected_bounds(upper_left, lower_right, epsg_code_source, epsg_code_target):
+
+    from osgeo import osr
+
+    def reproject_coords(coords,src_srs,tgt_srs):
+
+        trans_coords=[]
+        transform = osr.CoordinateTransformation(src_srs, tgt_srs)
+        for x,y in coords:
+            x,y,z = transform.TransformPoint(x,y)
+            trans_coords.append((x,y))
+        return tuple(trans_coords)
+
+    src_srs = osr.SpatialReference()
+    src_srs.ImportFromEPSG(epsg_code_source)
+
+    tgt_srs = osr.SpatialReference()
+    tgt_srs.ImportFromEPSG(epsg_code_target)
+
+    return reproject_coords((upper_left, lower_right), src_srs, tgt_srs)

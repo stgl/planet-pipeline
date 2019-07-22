@@ -2,7 +2,7 @@ def compositor(*args, **kwargs):
     
     import glob
     import subprocess
-    from landslide_pipeline.pipeline import OUTPUT
+    from landslide_pipeline.pipeline import OUTPUT, LOCATION
     import os
     
     if kwargs.get('cloudless_scenes', None) is not None:
@@ -12,6 +12,13 @@ def compositor(*args, **kwargs):
 
     is_planet = True if kwargs.get('items', None) is not None else False
 
+    ul = (LOCATION['min_longitude'], LOCATION['max_latitude'])
+    lr = (LOCATION['max_longitude'], LOCATION['min_latitude'])
+
+    from landslide_pipeline.utils import get_projected_bounds
+
+    (ulp, lrp) = get_projected_bounds(ul, lr)
+
     if is_planet:
         visual_filenames = [os.path.join(OUTPUT['output_path'], prefix) for prefix in kwargs.get('image_prefixes') if "Visual" in prefix]
         analytic_filenames = [os.path.join(OUTPUT['output_path'], prefix) for prefix in kwargs.get('image_prefixes') if "Analytic" in prefix]
@@ -19,12 +26,12 @@ def compositor(*args, **kwargs):
         if len(visual_filenames) > 0:
             output_name = os.path.join(OUTPUT['output_path'],OUTPUT['output_path'] + "_Visual.tif")
             arg = ['gdal_merge.py', '-o', output_name, '-createonly', '-of', 'GTiff', '-co',
-                   'COMPRESS=LZW'] + visual_filenames
+                   'COMPRESS=LZW', '-ul_lr', ulp[0], ulp[1], lrp[0], lrp[1]] + visual_filenames
             subprocess.call(arg)
             compositor_index = 0
             for visual_filename in visual_filenames:
                 arg = ['gdal_merge.py', '-o', '/tmp/visual_' + str(compositor_index) + '.tif', '-of', 'GTiff', '-co',
-                       'COMPRESS=LZW', output_name, visual_filename]
+                       'COMPRESS=LZW', '-ul_lr', ulp[0], ulp[1], lrp[0], lrp[1], output_name, visual_filename]
                 subprocess.call(arg)
                 compositor_index += 1
             arg = ['compositor', '-q', '-o', output_name]
@@ -37,12 +44,12 @@ def compositor(*args, **kwargs):
         if len(analytic_filenames) > 0:
             output_name = os.path.join(OUTPUT['output_path'], OUTPUT['output_path'] + "_Analytic.tif")
             arg = ['gdal_merge.py', '-o', output_name, '-createonly', '-of', 'GTiff', '-co',
-                   'COMPRESS=LZW'] + analytic_filenames
+                   'COMPRESS=LZW', '-ul_lr', ulp[0], ulp[1], lrp[0], lrp[1]] + analytic_filenames
             subprocess.call(arg)
             compositor_index = 0
             for visual_filename in visual_filenames:
                 arg = ['gdal_merge.py', '-o', '/tmp/analytic_' + str(compositor_index) + '.tif', '-of', 'GTiff', '-co',
-                       'COMPRESS=LZW', output_name, visual_filename]
+                       'COMPRESS=LZW', '-ul_lr', ulp[0], ulp[1], lrp[0], lrp[1], output_name, visual_filename]
                 subprocess.call(arg)
                 compositor_index += 1
             arg = ['compositor', '-q', '-o', output_name]

@@ -5,27 +5,37 @@ import sys
 
 DEBUG = True
 
+
 LOCATION = {'min_latitude': 30.4,
             'min_longitude': 102.4,
             'max_latitude': 32.8,
             'max_longitude': 105.1}
-
 '''
+
 LOCATION = {'min_latitude': 37.4146,
             'min_longitude': -122.1834,
             'max_latitude': 37.4383,
             'max_longitude': -122.1561}
 '''
 
-
 SATELLITE_INFO = ['PSOrthoTile', 'REOrthoTile']
-TIMES = {'start': "2019-06-01T00:00:00Z",
-         'end': "2019-07-01T18:59:00Z"}
+TIMES = {'start': "2019-06-01T00:00:00",
+         'end': "2019-07-01T18:59:00"}
 
 MAX_ACQUISITIONS = 10
+TILE_MAX_PIXELS = 5000
+
+
 
 OUTPUT = {'output_path': 'wenchuan',
           'output_projection': 32648}
+
+
+'''
+OUTPUT = {'output_path': 'stanford',
+          'output_projection': 32610}
+'''
+
 
 CB_PERCENT = 5.0
 '''
@@ -45,15 +55,15 @@ LS_PIPELINE = (#'landslide_pipeline.landsat_loader.load_data', # landsat_loader 
 '''
 
 LS_PIPELINE = ('landslide_pipeline.io.load_pipeline', 
-               'landslide_pipeline.planet_loader.load_data', # planet data download
-               'landslide_pipeline.planet_loader.reproject_assets', # planet reprojection
+               'landslide_pipeline.planet_mosaic_loader.load_data', # planet data download
+               'landslide_pipeline.planet_mosaic_loader.reproject_assets', # planet reprojection
                'landslide_pipeline.io.save_pipeline',
-               'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
+               #'landslide_pipeline.plcompositor.compositor', # merge image set into cloud-free(ish) mosaic
                #'landslide_pipeline.mosaic.mosaic',
                #'landslide_pipeline.color.correct',
-               'landslide_pipeline.image_chips.create',
-               'landslide_pipeline.image_chips.convert',
-               'landslide_pipeline.image_chips.resample',
+               #'landslide_pipeline.image_chips.create',
+               #'landslide_pipeline.image_chips.convert',
+               #'landslide_pipeline.image_chips.resample',
                #'landslide_pipeline.tensorflow.chips_to_tfrecords',
                #'landslide_pipeline.tensorflow.train',
                #'landslide_pipeline.tensorflow.export',
