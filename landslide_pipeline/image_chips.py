@@ -15,8 +15,8 @@ def create(**kwargs):
     subprocess.call(['ogr2ogr', '-s_srs', os.path.join(map_name, map_name + '.prj'), '-t_srs', 'EPSG:' +
                      str(output['output_projection']), reprojected_map, os.path.join(map_name, map_name + '.shp')])
 
-    if not os.path.isdir('image_chips'):
-        os.mkdir('image_chips')
+    if not os.path.isdir(os.path.join(output['output_path'],'image_chips')):
+        os.mkdir(os.path.join(output['output_path'],'image_chips'))
 
     chips = []
 
@@ -32,15 +32,14 @@ def create(**kwargs):
 
             geom = ft.GetGeometryRef()
             extent = geom.GetEnvelope()
+            raster_count = 0
 
             for cloudless_scene in cloudless_scenes:
 
-                raster_count = 0
-
-                left = extent[0]
-                right = extent[1]
-                top = extent[2]
-                bottom = extent[3]
+                left = min([extent[0], extent[1]])
+                right = max([extent[0], extent[1]])
+                top = max([extent[2], extent[3]])
+                bottom = min([extent[2], extent[3]])
 
                 coordinates = {'xmin': left,
                                'xmax': right,
@@ -49,7 +48,7 @@ def create(**kwargs):
 
                 chip_name = 'chip_' + str(feature_count) + '_' + str(raster_count)
                 import os
-                subprocess.call(['gdalwarp', cloudless_scene, os.path.join('image_chips', chip_name + '.TIF'), '-te',
+                subprocess.call(['gdalwarp', cloudless_scene['filename'], os.path.join(output['output_path'], 'image_chips', chip_name + '.TIF'), '-te',
                                  str(left), str(bottom), str(right), str(top)])
                 chips += [{'name': chip_name,
                            'coordinates': coordinates}]

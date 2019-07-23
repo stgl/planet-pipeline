@@ -104,6 +104,11 @@ def load_data(**kwargs):
     except:
         pass
 
+    try:
+        os.mkdir('.tmp')
+    except:
+        pass
+
     metadata = query_planet_mosaic(location, times, api_key)
     kwargs['query_metadata'] = metadata
 
@@ -115,7 +120,7 @@ def load_data(**kwargs):
                 + '/full?api_key=' + api_key
             r = requests.get(url)
 
-            tilename = '/tmp/' + str(counter)
+            tilename = os.path.join('.tmp', str(counter))
             counter += 1
             tilenames += [tilename]
             with open(tilename, 'wb') as f:
@@ -148,7 +153,7 @@ def reproject_assets(**kwargs):
 
     if kwargs.get('reprojected') is not None:
         return kwargs
-
+    import os
     output = kwargs['OUTPUT']
     cloudless_scenes = kwargs['cloudless_scenes']
     output_projection = output['output_projection']
@@ -157,11 +162,11 @@ def reproject_assets(**kwargs):
             import subprocess as sp
             arg = ['gdalwarp', '-s_srs', 'EPSG:' + str(cloudless_scene['coordinate_system']),
                    '-t_srs', 'EPSG:' + str(output['output_projection']), '-of', 'GTiff', '-co', 'COMPRESS=LZW',
-                   '-co', 'BIGTIFF=IF_SAFER', cloudless_scene['filename'], '/tmp/tmpreproj.tif']
+                   '-co', 'BIGTIFF=IF_SAFER', cloudless_scene['filename'], os.path.join('.tmp','tmpreproj.tif')]
             sp.call(arg)
             arg = ['rm', '-f', cloudless_scene['filename']]
             sp.call(arg)
-            arg = ['mv', '/tmp/tmpreproj.tif', cloudless_scene['filename']]
+            arg = ['mv', os.path.join('.tmp','tmpreproj.tif'), cloudless_scene['filename']]
             sp.call(arg)
             print('Reprojected: ', cloudless_scene['filename'])
         else:
