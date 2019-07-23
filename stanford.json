@@ -1,0 +1,17 @@
+{
+  "PL_API_KEY": "58613e03d31d4476ae132fbe8bd0afca",
+  "OUTPUT": {
+    "output_path": "stanford",
+    "output_projection": "32610"
+  },
+  "TIMES": {
+    "start": "2019-06-01T00:00:00",
+    "end": "2019-07-01T18:59:00"
+  },
+  "LOCATION": {
+    "min_latitude": 37.4146,
+    "min_longitude": -122.1834,
+    "max_latitude": 37.4383,
+    "max_longitude": -122.1561
+  }
+}

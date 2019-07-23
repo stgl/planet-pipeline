@@ -197,3 +197,42 @@ def get_projected_bounds(upper_left, lower_right, epsg_code_source, epsg_code_ta
     tgt_srs.ImportFromEPSG(epsg_code_target)
 
     return reproject_coords((upper_left, lower_right), src_srs, tgt_srs)
+
+def get_map_bounds_in_projection(map_name, epsg_code):
+
+    import ogr
+    import os
+    from osgeo import osr
+
+    def reproject_coords(coords,src_srs,tgt_srs):
+
+        trans_coords=[]
+        transform = osr.CoordinateTransformation(src_srs, tgt_srs)
+        for x,y in coords:
+            x,y,z = transform.TransformPoint(x,y)
+            trans_coords.append((x,y))
+        return tuple(trans_coords)
+
+    path = os.path.join(map_name,map_name + '.shp')
+    ds = ogr.Open(path, 1)
+    lyr = ds.GetLayer(0)
+    extent = lyr.GetExtent()
+    ul_lr = ((extent[0], extent[3]), (extent[1], extent[2]))
+    tgt_srs = osr.SpatialReference()
+    tgt_srs.ImportFromEPSG(epsg_code)
+    ul_lr_reproj = reproject_coords(ul_lr, lyr.GetSpatialRef(), tgt_srs)
+    return min(ul_lr_reproj[0][0], ul_lr_reproj[1][0]), max(ul_lr_reproj[0][0], ul_lr_reproj[1][0]), \
+           min(ul_lr_reproj[1][1], ul_lr_reproj[0][1]), max(ul_lr_reproj[1][1], ul_lr_reproj[0][1])
+
+def set_extent_from_landslide_map(**kwargs):
+
+    map_name = kwargs['LANDSLIDE_MAP']['name']
+    epsg_code = 4326
+
+    (min_y, max_y, min_x, max_x) = get_map_bounds_in_projection(map_name, epsg_code)
+
+    kwargs['LOCATION'] = {'max_longitude': max_x,
+                          'min_longitude': min_x,
+                          'min_latitude': min_y,
+                          'max_latitude': max_y}
+    return kwargs

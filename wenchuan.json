@@ -1,0 +1,17 @@
+{
+  "MAX_CHIP_DIMENSION": 200,
+  "LANDSLIDE_MAP": {
+    "minimum_area": 25000,
+    "area_field": "AREA",
+    "name": "Li_and_others_2014"
+  },
+  "PL_API_KEY": "58613e03d31d4476ae132fbe8bd0afca",
+  "OUTPUT": {
+    "output_path": "wenchuan",
+    "output_projection": "32648"
+  },
+  "TIMES": {
+    "start": "2019-06-01T00:00:00",
+    "end": "2019-07-01T18:59:00"
+  }
+}

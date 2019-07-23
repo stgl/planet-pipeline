@@ -1,93 +1,91 @@
-def create(*args, **kwargs):
-    
-    from landslide_pipeline.pipeline import OUTPUT, MIN_AREA, CHIP_SIZE, MAP as map
-    import os, ogr, subprocess
-    from osgeo import gdal
-    import json
-    
-    colorbalanced_scene = OUTPUT['output_path'] + "/" + OUTPUT['output_path'] + '_cb.TIF'
-    
-    proc = subprocess.Popen(['gdalsrsinfo', '-o', 'wkt', colorbalanced_scene], stdout=subprocess.PIPE)
-    projection_info = proc.stdout.read()
-    reprojected_map = map + '/' + map + '_reproj.shp'
+def create(**kwargs):
 
-    subprocess.call(['ogr2ogr', '-s_srs', map + '/' + map + '.prj', '-t_srs', projection_info, '-where', '"Area">={0}'.format(MIN_AREA), reprojected_map, map + '/' + map + '.shp'])
+    if kwargs.get('chips') is not None:
+        return kwargs
+
+    import os, ogr, subprocess
+
+    cloudless_scenes = kwargs['cloudless_scenes']
+    output = kwargs['OUTPUT']
+    map_name = kwargs['LANDSLIDE_MAP']['name']
+    map_area_field = kwargs['LANDSLIDE_MAP']['area_field']
+    min_area = kwargs['LANDSLIDE_MAP']["minimum_area"]
+    reprojected_map = os.path.join(map_name, map_name + '_reproj.shp')
+
+    subprocess.call(['ogr2ogr', '-s_srs', os.path.join(map_name, map_name + '.prj'), '-t_srs', 'EPSG:' +
+                     str(output['output_projection']), reprojected_map, os.path.join(map_name, map_name + '.shp')])
+
+    if not os.path.isdir(os.path.join(output['output_path'],'image_chips')):
+        os.mkdir(os.path.join(output['output_path'],'image_chips'))
+
+    chips = []
 
     ds = ogr.Open(reprojected_map, 1)
     lyr = ds.GetLayer(0)
     lyr.ResetReading()
     ft = lyr.GetNextFeature()
-    counter = 0
-    while ft is not None:
-        ft.SetField('id', counter)
-        lyr.SetFeature(ft)
-        ft = lyr.GetNextFeature()
-        counter += 1
-    ds = None
 
-    raster_ds = gdal.Open(colorbalanced_scene)
-    (_, pixelSizeX, _, _, _, pixelSizeY) = raster_ds.GetGeoTransform()
-    pixelSizeY = -pixelSizeY
-    
-    if not os.path.isdir('image_chips'):
-        os.mkdir('image_chips')
-    ds = ogr.Open(reprojected_map)
-    lyr = ds.GetLayer(0)
-    lyr.ResetReading()
-    ft = lyr.GetNextFeature()
-    
+    feature_count = 0
+
     while ft is not None:
-        geom=ft.GetGeometryRef()
-        extent = geom.GetEnvelope()
-        centerX = (extent[1] + extent[0]) / 2.0
-        centerY = (extent[3] + extent[2]) / 2.0
-        
-        left = centerX - CHIP_SIZE / 2.0 * pixelSizeX
-        right = centerX + CHIP_SIZE / 2.0 * pixelSizeX
-        top = centerY + CHIP_SIZE / 2.0 * pixelSizeY
-        bottom = centerY - CHIP_SIZE / 2.0 * pixelSizeY
-        
-        width = right - left
-        height = top - bottom
-        
-        normalized_coordinates = {'xmin': (extent[0] - left) / width,
-                                  'xmax': (extent[1] - left) / width,
-                                  'ymin': (extent[2] - bottom) / height,
-                                  'ymax': (extent[3] - bottom) / height }
-        iden = ft.GetField('id')
-        chip_name = 'image_chips/chip_' + str(iden) 
-        subprocess.call(['gdalwarp', colorbalanced_scene, chip_name + '.TIF', '-te', str(left), str(bottom), str(right), str(top)])
-        json.dump(normalized_coordinates, open(chip_name + '.json', 'w'))
-        ft = lyr.GetNextFeature() 
-        
-    
+        if ft.GetField(map_area_field) >= min_area:
+
+            geom = ft.GetGeometryRef()
+            extent = geom.GetEnvelope()
+            raster_count = 0
+
+            for cloudless_scene in cloudless_scenes:
+
+                left = min([extent[0], extent[1]])
+                right = max([extent[0], extent[1]])
+                top = max([extent[2], extent[3]])
+                bottom = min([extent[2], extent[3]])
+
+                coordinates = {'xmin': left,
+                               'xmax': right,
+                               'ymin': bottom,
+                               'ymax': top}
+
+                chip_name = 'chip_' + str(feature_count) + '_' + str(raster_count)
+                import os
+                subprocess.call(['gdalwarp', cloudless_scene['filename'], os.path.join(output['output_path'], 'image_chips', chip_name + '.TIF'), '-te',
+                                 str(left), str(bottom), str(right), str(top)])
+                chips += [{'name': chip_name,
+                           'coordinates': coordinates}]
+                raster_count += 1
+            feature_count += 1
+        ft = lyr.GetNextFeature()
+
+    kwargs['chips'] = chips
     return kwargs
 
-def convert(*args, **kwargs):
+
+def convert(**kwargs):
     
     import os, subprocess, glob
     
-    chips = glob.glob('image_chips/*.TIF')
+    chips = glob.glob(os.path.join('image_chips', '*.TIF'))
     
     for chip in chips:
         chip_output = chip.replace('.TIF','.png')
-        subprocess.call(['convert', chip, chip_output]);
+        subprocess.call(['convert', chip, chip_output])
         os.remove(chip)
 
     return kwargs
-    
+
+
 def resample(*args, **kwargs):
 
-    from landslide_pipeline.pipeline import MAX_CHIP_DIMENSION
     from landslide_pipeline.utils import resample_image
-    import glob
+    import glob, os
     from PIL import Image
 
-    chips = glob.glob('image_chips/*.png')
+    max_chip_dimension = kwargs['MAX_CHIP_DIMENSION']
+    chips = glob.glob(os.path.join('image_chips','*.png'))
 
     for chip in chips:
         image = Image.open(chip)
-        image = resample_image(image, max_dim_size=MAX_CHIP_DIMENSION)
+        image = resample_image(image, max_dim_size=max_chip_dimension)
         image.save(chip)
 
     return kwargs
