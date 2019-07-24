@@ -228,7 +228,7 @@ def set_extent_from_landslide_map(**kwargs):
 
     if kwargs.get('LOCATION') is not None:
         return kwargs
-    
+
     map_name = kwargs['LANDSLIDE_MAP']['name']
     epsg_code = 4326
 
