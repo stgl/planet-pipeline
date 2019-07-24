@@ -29,12 +29,6 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
 
     out = kwargs.copy()
 
-    # load parameters from file:
-
-    import json
-    parameters = json.load(open(out['parameter_file'],'r'))
-    out.update(parameters)
-
     # load parameters from pickle if present:
 
     import pickle, os
@@ -44,6 +38,12 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
         out.update(pipeline_parameters)
     except FileNotFoundError:
         pass
+
+    # load parameters from file:
+
+    import json
+    parameters = json.load(open(out['parameter_file'], 'r'))
+    out.update(parameters)
 
     for idx, name in enumerate(pipeline):
         out['pipeline_index'] = pipeline_index + idx
