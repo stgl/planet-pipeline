@@ -34,7 +34,7 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
     import json
     parameters = json.load(open(out['parameter_file'], 'r'))
     out.update(parameters)
-    
+
     # load parameters from pickle if present:
 
     import pickle, os
