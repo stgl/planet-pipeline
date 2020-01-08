@@ -81,6 +81,11 @@ def query_planet_mosaic(location, times, api_key):
     start = times['start']
     end = times['end']
 
+    if start[-1] == 'Z':
+        start = start[0:-1]
+    if end[-1] == 'Z':
+        end = end[0:-1]
+
     return metadata(ul, lr, start, end)
 
 

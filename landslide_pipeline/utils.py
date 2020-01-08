@@ -76,8 +76,7 @@ def get_statistics_for_file(filename):
                                'range_max': range_max} 
     return return_dict
  
- 
-import cv2
+
 import math
 import numpy as np
 
@@ -95,6 +94,7 @@ def apply_threshold(matrix, low_value, high_value):
     return matrix
 
 def simplest_cb(img, percent):
+    import cv2
     assert img.shape[2] == 3
     assert percent > 0 and percent < 100
 

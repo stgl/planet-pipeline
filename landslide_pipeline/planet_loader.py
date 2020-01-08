@@ -3,44 +3,50 @@ def load_data(*args, **kwargs):
     if kwargs.get('image_prefixes', None) is not None and kwargs.get('items', None) is not None:
         return kwargs
 
-    from landslide_pipeline.pipeline import LOCATION, TIMES, SATELLITE_INFO, OUTPUT, DEBUG
+    location = kwargs['LOCATION']
+    times = kwargs['TIMES']
+    output = kwargs['OUTPUT']
+    api_key = kwargs['PL_API_KEY']
+    satellite_info = kwargs['SATELLITE_INFO']
+    max_acquisitions = kwargs['MAX_ACQUISITIONS']
+
+    DEBUG = kwargs.get('DEBUG', False)
+
     import os
     import planet.api as api
     import requests
-    from landslide_pipeline.pipeline import OUTPUT
 
     # Set up client:
 
-    api_key = "58613e03d31d4476ae132fbe8bd0afca"
     os.environ["PL_API_KEY"] = api_key
 
     client = api.ClientV1()
 
     # Set up query:
 
-    sat_info = SATELLITE_INFO
+    sat_info = satellite_info
 
     coordinates = [
          [
             [
-                LOCATION['min_longitude'],
-                LOCATION['min_latitude']
+                location['min_longitude'],
+                location['min_latitude']
             ],
             [
-                LOCATION['max_longitude'],
-                LOCATION['min_latitude']
+                location['max_longitude'],
+                location['min_latitude']
             ],
             [
-                LOCATION['max_longitude'],
-                LOCATION['max_latitude']
+                location['max_longitude'],
+                location['max_latitude']
             ],
             [
-                LOCATION['min_longitude'],
-                LOCATION['max_latitude']
+                location['min_longitude'],
+                location['max_latitude']
             ],
             [
-                LOCATION['min_longitude'],
-                LOCATION['min_latitude']
+                location['min_longitude'],
+                location['min_latitude']
             ]
          ]
       ]
@@ -69,8 +75,8 @@ def load_data(*args, **kwargs):
                         "field_name": "acquired",
                         "config":
                             {
-                                "gt": TIMES['start'],
-                                "lte": TIMES['end']
+                                "gt": times['start'],
+                                "lte": times['end']
                             }
                     }
                 ]
@@ -85,15 +91,14 @@ def load_data(*args, **kwargs):
     print('Query returned ' + str(num_items) + ' items.')
 
     # Download items:
-    output_directory = os.path.join(os.getcwd(), OUTPUT['output_path'])
+    output_directory = os.path.join(os.getcwd(), output['output_path'])
     try:
         os.mkdir(output_directory)
     except:
         pass
 
-    from landslide_pipeline.pipeline import MAX_ACQUISITIONS
     from concurrent.futures import ThreadPoolExecutor, as_completed
-    executor = ThreadPoolExecutor(max_workers = MAX_ACQUISITIONS)
+    executor = ThreadPoolExecutor(max_workers = max_acquisitions)
 
     all_futures = []
 
@@ -137,7 +142,7 @@ def load_data(*args, **kwargs):
     import numpy as np
 
     potential_items_to_download = [item_i for item_i in items.items_iter(250)]
-    items_to_download = [potential_items_to_download[x] for x in np.random.choice(len(potential_items_to_download), MAX_ACQUISITIONS, replace=False)] if len(potential_items_to_download) > MAX_ACQUISITIONS else potential_items_to_download
+    items_to_download = [potential_items_to_download[x] for x in np.random.choice(len(potential_items_to_download), max_acquisitions, replace=False)] if len(potential_items_to_download) > max_acquisitions else potential_items_to_download
 
     for item_i in items_to_download:
         all_futures += activate_and_download(item_i)
@@ -152,10 +157,10 @@ def load_data(*args, **kwargs):
 
     # Put all filenames of all assets into kwargs['image_prefixes']:
 
-    this_args = {'start': TIMES['start'],
-                 'end': TIMES['end'],
-                 'satellite': SATELLITE_INFO,
-                 'output_path': OUTPUT['output_path']}
+    this_args = {'start': times['start'],
+                 'end': times['end'],
+                 'satellite': satellite_info,
+                 'output_path': output['output_path']}
     image_prefixes = []
     items_list = []
     for result in results:
@@ -168,15 +173,15 @@ def load_data(*args, **kwargs):
 
 def reproject_assets(*args, **kwargs):
 
-    from landslide_pipeline.pipeline import OUTPUT
+    output = kwargs['OUTPUT']
     # Save items (if not done so already, making sure they are stored in OUTPUT['output_path']):
-    output_projection = OUTPUT['output_projection']
+    output_projection = output['output_projection']
     for (item, filename) in zip(kwargs['items'], kwargs['image_prefixes']):
         import os
-        full_filename = os.path.join(OUTPUT['output_path'], filename)
+        full_filename = os.path.join(output['output_path'], filename)
         if int(item['properties']['epsg_code']) != output_projection:
             import subprocess as sp
-            arg = ['gdalwarp', '-s_srs', 'EPSG:' + str(item['properties']['epsg_code']), '-t_srs', 'EPSG:' + str(OUTPUT['output_projection']), full_filename, '/tmp/tmpreproj.tif']
+            arg = ['gdalwarp', '-s_srs', 'EPSG:' + str(item['properties']['epsg_code']), '-t_srs', 'EPSG:' + str(output['output_projection']), full_filename, '/tmp/tmpreproj.tif']
             sp.call(arg)
             arg = ['rm', '-f', full_filename]
             sp.call(arg)
