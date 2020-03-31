@@ -3,11 +3,11 @@
 # Python script to implement landslide mapping download and processing pipeline.
 
 LS_PIPELINE = ('landslide_pipeline.utils.set_extent_from_landslide_map',
-               'landslide_pipeline.planet_mosaic_loader.load_data', # planet data download
-               'landslide_pipeline.planet_mosaic_loader.reproject_assets', # planet reprojection
-               'landslide_pipeline.image_chips.define',
-               'landslide_pipeline.image_chips.refine',
-               'landslide_pipeline.image_chips.create',
+               'landslide_pipeline.planet_loader.load_data', # planet data download
+               #'landslide_pipeline.planet_mosaic_loader.reproject_assets', # planet reprojection
+               #'landslide_pipeline.image_chips.define',
+               #'landslide_pipeline.image_chips.refine',
+               #'landslide_pipeline.image_chips.create',
                #'landslide_pipeline.image_chips.resample',
                #'landslide_pipeline.tensorflow.chips_to_tfrecords',
                #'landslide_pipeline.tensorflow.train',
@@ -15,6 +15,11 @@ LS_PIPELINE = ('landslide_pipeline.utils.set_extent_from_landslide_map',
                #'landslide_pipeline.tensorflow.classify',
                )
 
+MONTHLY_ANALYTIC_PIPELINE = ('landslide_pipeline.planet_orders_loader.load_data',
+                             'landslide_pipeline.planet_orders_loader.compositor',
+                             'landslide_pipeline.planet_orders_loader.clip',
+                             'landslide_pipeline.planet_orders_loader.reproject',
+                             'landslide_pipeline.planet_orders_loader.place_order')
 
 def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
     def module_member(name):

@@ -76,8 +76,7 @@ def get_statistics_for_file(filename):
                                'range_max': range_max} 
     return return_dict
  
- 
-import cv2
+
 import math
 import numpy as np
 
@@ -95,6 +94,7 @@ def apply_threshold(matrix, low_value, high_value):
     return matrix
 
 def simplest_cb(img, percent):
+    import cv2
     assert img.shape[2] == 3
     assert percent > 0 and percent < 100
 
@@ -239,3 +239,21 @@ def set_extent_from_landslide_map(**kwargs):
                           'min_latitude': min_y,
                           'max_latitude': max_y}
     return kwargs
+
+def get_bounding_info_from_geojson(filename):
+
+    from osgeo import ogr
+    import json
+
+    driver_name = "GeoJSON"
+    driver = ogr.GetDriverByName(driver_name)
+
+    data = driver.Open(filename, 0)
+    in_layer = data.GetLayer()
+
+    geomcol = ogr.Geometry(ogr.wkbGeometryCollection)
+    for feature in in_layer:
+        geomcol.AddGeometry(feature.GetGeometryRef())
+
+    return geomcol.GetEnvelope(), json.loads(geomcol.ConvexHull().ExportToJson())
+

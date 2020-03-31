@@ -1,0 +1,17 @@
+{
+  "NOTIFICATION": true,
+  "LOCATION": "Cox_Bazar_District.geojson",
+  "NAME": "Cox_Bazar 0619",
+  "BUNDLE": "analytic",
+  "SATELLITE_INFO": [
+    "PSScene4Band"
+  ],
+  "PL_API_KEY": "6ef9eceb98004555a9694f0b0ecf5fb7",
+  "OUTPUT": {
+    "output_projection": "32646"
+  },
+  "TIMES": {
+    "start": "2019-06-01T00:00:00Z",
+    "end": "2019-07-01T18:59:00Z"
+  }
+}
