@@ -15,6 +15,11 @@ LS_PIPELINE = ('landslide_pipeline.utils.set_extent_from_landslide_map',
                #'landslide_pipeline.tensorflow.classify',
                )
 
+MONTHLY_ANALYTIC_PIPELINE = ('landslide_pipeline.planet_orders_loader.load_data',
+                             'landslide_pipeline.planet_orders_loader.compositor',
+                             'landslide_pipeline.planet_orders_loader.clip',
+                             'landslide_pipeline.planet_orders_loader.reproject',
+                             'landslide_pipeline.planet_orders_loader.place_order')
 
 def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
     def module_member(name):
