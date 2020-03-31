@@ -63,11 +63,7 @@ def load_data(*args, **kwargs):
                     {
                         "type": "GeometryFilter",
                         "field_name": "geometry",
-                        "config":
-                            {
-                                "type": "Polygon",
-                                "coordinates": coordinates
-                            }
+                        "config":convex_hull
                     },
                     {
                         "type": "DateRangeFilter",
@@ -133,7 +129,7 @@ def place_order(*args, **kwargs):
                    }
                ],
                'tools': kwargs['tools'],
-               'notification': kwargs.get('NOTIFICATION', False)}
+               'notifications': {'email': kwargs.get('NOTIFICATION', False)}}
     import json
 
     api_key = kwargs['PL_API_KEY']
