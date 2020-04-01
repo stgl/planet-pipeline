@@ -10,6 +10,8 @@ def load_data(*args, **kwargs):
     times = kwargs['TIMES']
     api_key = kwargs['PL_API_KEY']
     satellite_info = kwargs['SATELLITE_INFO']
+    cloud_cover = kwargs.get('CLOUD_COVER', 0.1)
+    ground_control = kwargs.get('GROUND_CONTROL', True)
 
     import os
     import planet.api as api
@@ -24,30 +26,6 @@ def load_data(*args, **kwargs):
 
     sat_info = satellite_info
 
-    coordinates = [
-         [
-            [
-                bounding_box[0],
-                bounding_box[2]
-            ],
-            [
-                bounding_box[1],
-                bounding_box[2]
-            ],
-            [
-                bounding_box[1],
-                bounding_box[3]
-            ],
-            [
-                bounding_box[0],
-                bounding_box[3]
-            ],
-            [
-                bounding_box[0],
-                bounding_box[2]
-            ]
-         ]
-      ]
     query_and_geofilter = {
         "name": name,
         "item_types": sat_info,
@@ -58,12 +36,12 @@ def load_data(*args, **kwargs):
                     {
                         "type": "RangeFilter",
                         "field_name": "cloud_cover",
-                        "config": {"lte": 0.5}
+                        "config": {"lte": cloud_cover}
                     },
                     {
                         "type": "GeometryFilter",
                         "field_name": "geometry",
-                        "config":convex_hull
+                        "config": convex_hull
                     },
                     {
                         "type": "DateRangeFilter",
@@ -85,8 +63,10 @@ def load_data(*args, **kwargs):
     num_items = 0
     for page in response.iter():
         for item in page.items_iter(250):
-            ids += [item['id']]
-            num_items += 1
+            if (ground_control and item['properties']['ground_control']) or not ground_control:
+                ids += [item['id']]
+                num_items += 1
+
     print('Query returned ' + str(num_items) + ' items.')
     kwargs['item_ids'] = ids
 
