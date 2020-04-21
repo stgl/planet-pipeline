@@ -257,3 +257,11 @@ def get_bounding_info_from_geojson(filename):
 
     return geomcol.GetEnvelope(), json.loads(geomcol.ConvexHull().ExportToJson())
 
+def cancel_orders(api_key):
+    import requests,json
+    session = requests.Session()
+    session.auth = (api_key, '')
+    orders = session.get('https://api.planet.com/compute/ops/orders/v2').json()['orders']
+    ids = [order['id'] for order in orders]
+    headers = {'content-type': 'application/json'}
+    print(session.post('https://api.planet.com/compute/ops/bulk/orders/v2/cancel', data = json.dumps({'order_ids':ids}), headers=headers).json())
