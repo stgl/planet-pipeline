@@ -80,4 +80,39 @@ def compositor(*args, **kwargs):
                 kwargs['cloudless_scenes'] += [pathrow_dir + '/' + os.path.basename(pathrow_dir) + '.TIF']
     
     return kwargs
-    
+
+
+def orders_compositor(*args, **kwargs):
+    import subprocess, os
+    from .utils import get_bounding_box_from_files
+
+    if kwargs.get('cloudless_scene', None) is not None:
+        return kwargs
+
+    out = kwargs['OUTPUT']
+    filenames = [os.path.join(out['output_path'], out['output_path'] + '_' + str(counter) + '.tif') for counter in range(len(kwargs['item_ids']))]
+    bounding_box = get_bounding_box_from_files(filenames)
+    output_name = os.path.join(out['output_path'], out['output_path'] + "_composite.tif")
+
+    arg = ['gdal_merge.py', '-o', output_name, '-createonly', '-of', 'GTiff', '-co',
+           'COMPRESS=LZW', '-co', 'BIGTIFF=YES', '-ul_lr',str(bounding_box[0]),str(bounding_box[3]),str(bounding_box[1]),str(bounding_box[2]), '-a_nodata', '0', ''] + filenames
+    subprocess.call(arg)
+
+    for filename in filenames:
+        arg = ['gdal_merge.py', '-o',filename + '_tmp.tif', '-of', 'GTiff', '-co',
+               'COMPRESS=LZW', '-ul_lr', str(bounding_box[0]),str(bounding_box[3]),str(bounding_box[1]),str(bounding_box[2]), '-a_nodata', '0', output_name, filename]
+        subprocess.call(arg)
+
+    arg = ['compositor', '-q', '-s', 'quality', 'greenest', '-o', output_name]
+    for filename in filenames:
+        arg += ['-i', filename + '_tmp.tif']
+    subprocess.call(arg)
+
+    for filename in filenames:
+        os.remove(filename + '_tmp.tif')
+    kwargs['cloudless_scene'] = output_name
+
+    return kwargs
+
+
+

@@ -257,6 +257,28 @@ def get_bounding_info_from_geojson(filename):
 
     return geomcol.GetEnvelope(), json.loads(geomcol.ConvexHull().ExportToJson())
 
+def get_bounding_box_from_files(filenames):
+    import subprocess, json
+
+    bounding_box = None
+    for filename in filenames:
+        arg = ['gdalinfo', '-json', filename]
+        process = subprocess.Popen(arg, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        out, err = process.communicate()
+        info = json.loads(out)
+        coordinates = info['cornerCoordinates']
+        x = [coordinates['upperLeft'][0], coordinates['upperRight'][0], coordinates['lowerLeft'][0],
+             coordinates['lowerRight'][0]]
+        y = [coordinates['upperLeft'][1], coordinates['upperRight'][1], coordinates['lowerLeft'][1],
+             coordinates['lowerRight'][1]]
+        bounding_box = [min(x), max(x), min(y), max(y)] if bounding_box is None else [min(x) if bounding_box[0] > min(x) else bounding_box[0],
+                                                                                      max(x) if bounding_box[1] < max(x) else bounding_box[1],
+                                                                                      min(y) if bounding_box[2] > min(y) else bounding_box[2],
+                                                                                      max(y) if bounding_box[3] < max(y) else bounding_box[3]]
+    return bounding_box
+
+
+
 def cancel_orders(api_key):
     import requests,json
     session = requests.Session()
@@ -265,3 +287,16 @@ def cancel_orders(api_key):
     ids = [order['id'] for order in orders]
     headers = {'content-type': 'application/json'}
     print(session.post('https://api.planet.com/compute/ops/bulk/orders/v2/cancel', data = json.dumps({'order_ids':ids}), headers=headers).json())
+
+def clip_cloudless_scene(**kwargs):
+
+    import os
+    if kwargs.get('cloudless_scene', None) is not None and os.path.exists(kwargs['cloudless_scene']):
+        import subprocess
+        cloudless_name = kwargs['cloudless_scene']
+        cloudless_clip_name = cloudless_name.replace('.tif','_clip.tif')
+        clipping_mask = kwargs['LOCATION']
+        arg = ['gdalwarp', '-of', 'GTiff', '-co', 'COMPRESS=LZW', '-co', 'BIGTIFF=YES', '-cutline', clipping_mask, '-crop_to_cutline', cloudless_name, cloudless_clip_name]
+        subprocess.call(arg)
+        kwargs['cloudless_scene_clipped'] = cloudless_clip_name
+    return kwargs

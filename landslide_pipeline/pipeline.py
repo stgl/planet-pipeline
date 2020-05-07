@@ -20,11 +20,10 @@ MONTHLY_ANALYTIC_PIPELINE = ('landslide_pipeline.planet_orders_loader.load_data'
                              'landslide_pipeline.planet_orders_loader.harmonize',
                              'landslide_pipeline.planet_orders_loader.toar',
                              'landslide_pipeline.planet_orders_loader.compositor',
-                             'landslide_pipeline.planet_orders_loader.cycle_orders')
-                             #'landslide_pipeline.planet_orders_loader.clip',
-                             #'landslide_pipeline.planet_orders_loader.reproject',
-                             #'landslide_pipeline.planet_orders_loader.place_order',
-                             #'landslide_pipeline.planet_orders_loader.get_order')
+                             'landslide_pipeline.planet_orders_loader.cycle_orders',
+                             'landslide_pipeline.plcompositor.orders_compositor',
+                             'landslide_pipeline.planet_orders_loader.clean_up_orders',
+                             'landslide_pipeline.utils.clip_cloudless_scene')
 
 def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
     def module_member(name):

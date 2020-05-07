@@ -138,10 +138,10 @@ def load_data(*args, **kwargs):
                         ids += [item['id']]
                         num_items += 1
 
-            if num_items < 6:
+            if num_items < 12 and this_usable >= 0:
                 this_usable -= 0.05
                 num_items = 0
-            elif num_items > 12:
+            elif num_items > 20:
                 this_usable += 0.05
                 num_items = 0
 
@@ -260,7 +260,17 @@ def get_order(*args, **kwargs):
         time.sleep(recheck_interval)
 
 def cycle_orders(*args, **kwargs):
-    import requests, os, time, json
+
+    import os
+    all_files_loaded = True
+    for counter in range(len(kwargs['item_ids'])):
+        if len(kwargs['item_ids'][counter]) > 0 and not os.path.exists(os.path.join(kwargs['OUTPUT']['output_path'], kwargs['OUTPUT']['output_path'] + '_' + str(counter) + '.tif')):
+            all_files_loaded = False
+
+    if all_files_loaded:
+        return kwargs
+
+    import requests, time, json, datetime
     from requests.auth import HTTPBasicAuth
 
     api_key = kwargs['PL_API_KEY']
@@ -294,28 +304,43 @@ def cycle_orders(*args, **kwargs):
                        ],
                        'tools': tools,
                        'notifications': {'email': kwargs.get('NOTIFICATION', False)}}
-
-            order_list += [
-                (requests.post(orders_url, data=json.dumps(request), auth=auth, headers=headers), counter)]
+            response_completed = False
+            while not response_completed:
+                response = requests.post(orders_url, data=json.dumps(request), auth=auth, headers=headers)
+                if response.status_code == 202:
+                    order_list += [(response, counter, datetime.datetime.now())]
+                    response_completed = True
+                    print('Launched order', counter)
+                elif response.status_code == 400 or response.status_code == 401:
+                    print('Request was invalid.  Not trying again.', counter)
+                    response_completed = True
+                else:
+                    print('There was a problem with the request.  Trying again in 10 seconds (response follows) ', counter, response.json())
+                    time.sleep(10.0)
 
         return order_list
 
     def check_orders(order_list):
         these_orders = []
-        for (order, counter) in order_list:
+        for (order, counter, launch_time) in order_list:
             check_link = order.json()['_links']['_self']
             try:
                 poll = session.get(check_link).json()
-                if poll['state'] == 'running' and len(poll['_links'].get('results', [])) > 0:
+                if (poll['state'] == 'running' or poll['state'] == 'success') and len(poll['_links'].get('results', [])) > 0:
                     for result in poll['_links']['results']:
                         if 'composite.tif' in result['name']:
                             r = requests.get(result['location'], allow_redirects=True)
                             open(os.path.join(out['output_path'], out['output_path']+'_'+str(counter)+'.tif'), 'wb').write(r.content)
+                            print('Completed order: ', counter)
+                elif poll['state'] != 'failed' and ((datetime.datetime.now() - launch_time).seconds) / 60 < 30:
+                    these_orders += [(order, counter, launch_time)]
                 elif poll['state'] != 'failed':
-                    these_orders += [(order, counter)]
-                print('Checked order ' + str(counter))
+                    print('Timeout, relaunching', counter, poll)
+                    these_orders = place_order(counter, these_orders)
+                else:
+                    print('Order failed', counter, poll)
             except:
-                print('Skipped order ' + str(counter))
+                these_orders += [(order, counter, launch_time)]
                 time.sleep(1.0)
             time.sleep(0.25)
         return these_orders
@@ -324,20 +349,26 @@ def cycle_orders(*args, **kwargs):
     out = kwargs['OUTPUT']
     max_number_of_orders = kwargs.get('MAX_NUMBER_OF_ORDERS', 2)
     current_counter = 0
-    current_orders = []
+    current_orders = None
 
     total_number_of_orders = len(kwargs['item_ids'])
-    while (len(current_orders) <= max_number_of_orders) and (current_counter < total_number_of_orders):
-        print('Placing order: ' + str(current_counter))
-        current_orders = place_order(current_counter, current_orders)
-        current_counter += 1
 
-    while len(current_orders) > 0:
-        while (len(current_orders) <= max_number_of_orders) and (current_counter < total_number_of_orders):
-            print('Placing order: ' + str(current_counter))
-            current_orders = place_order(current_counter, current_orders)
+    while current_orders is None or len(current_orders) > 0:
+        current_orders = current_orders if current_orders is not None else []
+        while len(current_orders) < max_number_of_orders and current_counter < total_number_of_orders:
+            if not os.path.exists(os.path.join(kwargs['OUTPUT']['output_path'], kwargs['OUTPUT']['output_path'] + '_' + str(current_counter) + '.tif')):
+                print('Placing order: ' + str(current_counter))
+                current_orders = place_order(current_counter, current_orders)
             current_counter += 1
         time.sleep(recheck_interval)
         current_orders = check_orders(current_orders)
 
+def clean_up_orders(**kwargs):
 
+    if kwargs.get('item_ids') is not None:
+        import os
+        for i in range(len(kwargs['item_ids'])):
+            filename = os.path.join(kwargs['OUTPUT']['output_path'], kwargs['OUTPUT']['output_path'] + '_' + str(i) + '.tif')
+            if os.path.exists(filename):
+                os.remove(filename)
+    return kwargs
