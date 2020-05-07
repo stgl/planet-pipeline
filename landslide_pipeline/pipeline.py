@@ -16,10 +16,14 @@ LS_PIPELINE = ('landslide_pipeline.utils.set_extent_from_landslide_map',
                )
 
 MONTHLY_ANALYTIC_PIPELINE = ('landslide_pipeline.planet_orders_loader.load_data',
-                             'landslide_pipeline.planet_orders_loader.compositor',
                              'landslide_pipeline.planet_orders_loader.clip',
-                             'landslide_pipeline.planet_orders_loader.reproject',
-                             'landslide_pipeline.planet_orders_loader.place_order')
+                             'landslide_pipeline.planet_orders_loader.harmonize',
+                             'landslide_pipeline.planet_orders_loader.toar',
+                             'landslide_pipeline.planet_orders_loader.compositor',
+                             'landslide_pipeline.planet_orders_loader.cycle_orders',
+                             'landslide_pipeline.plcompositor.orders_compositor',
+                             'landslide_pipeline.planet_orders_loader.clean_up_orders',
+                             'landslide_pipeline.utils.clip_cloudless_scene')
 
 def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
     def module_member(name):
@@ -44,9 +48,10 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
     # load parameters from pickle if present:
 
     import pickle, os
+    if not os.path.exists(os.path.join(out['OUTPUT']['output_path'])):
+        os.makedirs(os.path.join(out['OUTPUT']['output_path']))
     try:
-        pipeline_parameters = pickle.load(open(os.path.join(
-            out['OUTPUT']['output_path'], out['OUTPUT']['output_path'] + '.p'), 'rb'))
+        pipeline_parameters = pickle.load(open(os.path.join(out['OUTPUT']['output_path'], out['OUTPUT']['output_path']+'.p'), 'rb'))
         out.update(pipeline_parameters)
     except FileNotFoundError:
         pass
