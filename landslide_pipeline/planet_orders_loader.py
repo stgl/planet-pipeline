@@ -315,7 +315,10 @@ def cycle_orders(*args, **kwargs):
                     print('Request was invalid.  Not trying again.', counter)
                     response_completed = True
                 else:
-                    print('There was a problem with the request.  Trying again in 10 seconds (response follows) ', counter, response.json())
+                    try:
+                        print('There was a problem with the request.  Trying again in 10 seconds (response follows) ', counter, response.json())
+                    except:
+                        print('There was a problem with the request.  Trying again in 10 seconds (response mangled)')
                     time.sleep(10.0)
 
         return order_list
