@@ -6,6 +6,7 @@ def load_data(*args, **kwargs):
     tile_data = kwargs.get('TILE_DATA', False)
 
     from .utils import get_bounding_info_from_geojson
+    from planet.api.exceptions import APIException
 
     bounding_box, convex_hull = get_bounding_info_from_geojson(kwargs['LOCATION'])
     name = kwargs['NAME']
@@ -127,7 +128,15 @@ def load_data(*args, **kwargs):
                 }
             }
 
-            response = client.quick_search(query_and_geofilter)
+            success = False
+
+            while not success:
+                try:
+                    response = client.quick_search(query_and_geofilter)
+                    success = True
+                except APIException as e:
+                    print('Query request failed with exception: ', e)
+                    print('Trying again.')
 
             ids = []
 
