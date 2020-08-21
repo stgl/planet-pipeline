@@ -9,6 +9,7 @@ def load_data(*args, **kwargs):
     from planet.api.exceptions import APIException
 
     bounding_box, convex_hull = get_bounding_info_from_geojson(kwargs['LOCATION'])
+
     name = kwargs['NAME']
     times = kwargs['TIMES']
     api_key = kwargs['PL_API_KEY']
@@ -130,7 +131,7 @@ def load_data(*args, **kwargs):
 
             success = False
 
-            while not success:
+            while success is False:
                 try:
                     response = client.quick_search(query_and_geofilter)
                     success = True
@@ -218,8 +219,9 @@ def place_order(*args, **kwargs):
     kwargs['order_responses'] = []
     for [item_id_set, bb] in zip(kwargs['item_ids'],kwargs['bounding_boxes']):
         if len(item_id_set) > 0:
-            tools = kwargs['tools']
-            tools.append({'clip': {'aoi': bb}})
+            tools = kwargs.get('tools',None)
+            if tools is not None:
+                tools.append({'clip': {'aoi': bb}})
             request = {'name': name,
                        'products': [
                            {
@@ -299,7 +301,7 @@ def cycle_orders(*args, **kwargs):
 
         (item_id_set, bb) = (kwargs['item_ids'][counter], kwargs['bounding_boxes'][counter])
         if len(item_id_set) > 0:
-            tools = kwargs['tools'].copy()
+            tools = kwargs.get('tools',[])
             for tool in tools:
                 if tool.get('clip') is not None:
                     tool['clip']['aoi'] = bb
@@ -321,7 +323,7 @@ def cycle_orders(*args, **kwargs):
                     response_completed = True
                     print('Launched order', counter)
                 elif response.status_code == 400 or response.status_code == 401:
-                    print('Request was invalid.  Not trying again.', counter)
+                    print('Request was invalid.  Not trying again.', counter, response, json.dumps(request))
                     response_completed = True
                 else:
                     try:
@@ -377,8 +379,16 @@ def cycle_orders(*args, **kwargs):
 
 def clean_up_orders(**kwargs):
 
+    import os
+    if not kwargs.get('TILE_DATA', False):
+        filename = os.path.join(kwargs['OUTPUT']['output_path'],
+                                kwargs['OUTPUT']['output_path'] + '_0.tif')
+        new_filename = os.path.join(kwargs['OUTPUT']['output_path'],
+                                kwargs['OUTPUT']['output_path'] + '.tif')
+        if os.path.exists(filename):
+            os.rename(filename, new_filename)
+
     if kwargs.get('item_ids') is not None:
-        import os
         for i in range(len(kwargs['item_ids'])):
             filename = os.path.join(kwargs['OUTPUT']['output_path'], kwargs['OUTPUT']['output_path'] + '_' + str(i) + '.tif')
             if os.path.exists(filename):

@@ -17,13 +17,20 @@ LS_PIPELINE = ('landslide_pipeline.utils.set_extent_from_landslide_map',
 
 MONTHLY_ANALYTIC_PIPELINE = ('landslide_pipeline.planet_orders_loader.load_data',
                              'landslide_pipeline.planet_orders_loader.clip',
-                             'landslide_pipeline.planet_orders_loader.harmonize',
                              'landslide_pipeline.planet_orders_loader.toar',
                              'landslide_pipeline.planet_orders_loader.compositor',
                              'landslide_pipeline.planet_orders_loader.cycle_orders',
                              'landslide_pipeline.plcompositor.orders_compositor',
                              'landslide_pipeline.planet_orders_loader.clean_up_orders',
                              'landslide_pipeline.utils.clip_cloudless_scene')
+
+SINGLE_MONTHLY_ANALYTIC_PIPELINE = ('landslide_pipeline.planet_orders_loader.load_data',
+                             'landslide_pipeline.planet_orders_loader.clip',
+                             'landslide_pipeline.planet_orders_loader.toar',
+                             'landslide_pipeline.planet_orders_loader.compositor',
+                             'landslide_pipeline.planet_orders_loader.cycle_orders',
+                             'landslide_pipeline.planet_orders_loader.clean_up_orders')
+
 
 def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
     def module_member(name):
@@ -40,10 +47,17 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
     out = kwargs.copy()
 
     # load parameters from file:
+    if out.get('parameter_file', None) is not None:
+        import json
+        parameters = json.load(open(out['parameter_file'], 'r'))
+        out.update(parameters)
 
-    import json
-    parameters = json.load(open(out['parameter_file'], 'r'))
-    out.update(parameters)
+    # Remove API key from out if it exists:
+    out.pop('PL_API_KEY', None)
+
+    # Read API key from environmental variable:
+    import os
+    out['PL_API_KEY'] = os.environ['PL_API_KEY']
 
     # load parameters from pickle if present:
 
@@ -58,9 +72,10 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
 
     # load parameters from file:
 
-    import json
-    parameters = json.load(open(out['parameter_file'], 'r'))
-    out.update(parameters)
+    if out.get('parameter_file', None) is not None:
+        import json
+        parameters = json.load(open(out['parameter_file'], 'r'))
+        out.update(parameters)
 
     for idx, name in enumerate(pipeline):
         out['pipeline_index'] = pipeline_index + idx
@@ -75,4 +90,9 @@ def run_pipeline(pipeline, pipeline_index=0, *args, **kwargs):
         out['OUTPUT']['output_path'], out['OUTPUT']['output_path'] + '.p'), 'wb'))
 
     return out
+
+def load_template(filename):
+
+    import json
+    return json.load(open(filename, 'r'))
 
