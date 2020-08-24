@@ -121,8 +121,8 @@ def load_data(*args, **kwargs):
                                 "field_name": "acquired",
                                 "config":
                                     {
-                                        "gt": times['start'],
-                                        "lte": times['end']
+                                        "gte": times['start'],
+                                        "lt": times['end']
                                     }
                             }
                         ]
@@ -154,6 +154,12 @@ def load_data(*args, **kwargs):
             elif num_items > 20:
                 this_usable += 0.05
                 num_items = 0
+            elif this_usable <= 0:
+                if num_items > 0:
+                    print("{target_name}: Using only {num_items} because that's all there are.".format(num_items=num_items, target_name=name))
+                else:
+                    print("{target_name}: No images satisfying quality critera available.".format(target_name=name))
+                    break
 
         print('Query returned ' + str(num_items) + ' items.')
         kwargs['item_ids'].append(ids)

@@ -96,3 +96,31 @@ def load_template(filename):
     import json
     return json.load(open(filename, 'r'))
 
+def run_monthly_pipeline_for_daterange(pipeline, template_name, daterange):
+    from datetime import datetime
+    import calendar
+    from copy import deepcopy
+
+    def monthlist(dates):
+        start, end = [datetime.strptime(_, "%Y-%m-%d") for _ in dates]
+        total_months = lambda dt: dt.month + 12 * dt.year
+        mlist = []
+        for tot_m in range(total_months(start) - 1, total_months(end)):
+            y, m = divmod(tot_m, 12)
+            mlist.append(datetime(y, m + 1, 1))
+        return mlist
+
+    month_list = monthlist(daterange)
+
+    planet_template = load_template(template_name)
+
+    base_output = deepcopy(planet_template['OUTPUT']['output_path'])
+    base_name = deepcopy(planet_template['NAME'])
+
+    for month in month_list:
+        planet_template['TIMES']['start'] = month.strftime("%Y-%m-01T00:00:00Z")
+        planet_template['TIMES']['end'] = month.strftime("%Y-%m-") + str(
+            calendar.monthrange(month.year, month.month)[1]) + "T23:59:59Z"
+        planet_template['OUTPUT']['output_path'] = base_output + "_" + month.strftime("%m_%Y")
+        planet_template['NAME'] = base_name + "_" + month.strftime("%m_%Y")
+        run_pipeline(pipeline, **planet_template)
