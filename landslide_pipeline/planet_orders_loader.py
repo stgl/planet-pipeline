@@ -15,13 +15,15 @@ def load_data(*args, **kwargs):
     api_key = kwargs['PL_API_KEY']
     satellite_info = kwargs['SATELLITE_INFO']
     cloud_cover = kwargs.get('CLOUD_COVER', 0.1)
-    sun_elevation = kwargs.get('SUN_ELEVATION', 65)
+    sun_elevation_fraction = kwargs.get('SUN_ELEVATION', 0.5)
     ground_control = kwargs.get('GROUND_CONTROL', True)
     usable_data = kwargs.get('USABLE_DATA', 0.75)
-    view_angle = kwargs.get('VIEW_ANGLE', 4.0)
+    view_angle = kwargs.get('VIEW_ANGLE', 8.0)
 
     import os
     import planet.api as api
+    from pysolar.solar import get_altitude
+    from dateutil.parser import parse
 
     if tile_data:
         bounding_boxes = []
@@ -72,7 +74,16 @@ def load_data(*args, **kwargs):
     for bb in bounding_boxes:
         this_usable = usable_data
         num_items = 0
+        coordinates = bb['coordinates'][0]
+        center_lat, center_lng = (0.0, 0.0)
+        for coordinate in coordinates:
+            center_lat += coordinate[1]
+            center_lng += coordinate[0]
+        center_lat /= float(len(coordinates))
+        center_lng /= float(len(coordinates))
 
+        sun_elevation = abs(get_altitude(center_lat, center_lng, parse(times['start']) + (parse(times['end']) - parse(times['start'])) / 2.0) * sun_elevation_fraction)
+        print(sun_elevation)
         while num_items == 0:
             query_and_geofilter = {
                 "name": name,

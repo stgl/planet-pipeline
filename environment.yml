@@ -89,4 +89,4 @@ dependencies:
     - click==7.0
     - planet==1.4.4
     - requests-futures==0.9.7
-
+    - pysolar==0.8
