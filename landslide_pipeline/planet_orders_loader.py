@@ -83,7 +83,6 @@ def load_data(*args, **kwargs):
         center_lng /= float(len(coordinates))
 
         sun_elevation = abs(get_altitude(center_lat, center_lng, parse(times['start']) + (parse(times['end']) - parse(times['start'])) / 2.0) * sun_elevation_fraction)
-        print(sun_elevation)
         while num_items == 0:
             query_and_geofilter = {
                 "name": name,
