@@ -19,6 +19,7 @@ def load_data(*args, **kwargs):
     ground_control = kwargs.get('GROUND_CONTROL', True)
     usable_data = kwargs.get('USABLE_DATA', 0.75)
     view_angle = kwargs.get('VIEW_ANGLE', 8.0)
+    use_old_data = kwargs.get('USE_LEGACY_DATA', False)
 
     import os
     import planet.api as api
@@ -117,11 +118,6 @@ def load_data(*args, **kwargs):
                                 "config": {"lte": view_angle}
                             },
                             {
-                                "type": "StringInFilter",
-                                "field_name": "instrument",
-                                "config": ["PS2.SD"]
-                            },
-                            {
                                 "type": "GeometryFilter",
                                 "field_name": "geometry",
                                 "config": bb
@@ -138,6 +134,17 @@ def load_data(*args, **kwargs):
                         ]
                 }
             }
+
+            if use_old_data:
+                query_and_geofilter["filter"]["config"] += [{
+                                "type": "StringInFilter",
+                                "field_name": "instrument",
+                                "config": ["PS2.SD"]
+                            }]
+                tools = kwargs.get('tools', [])
+                tools.append({'harmonize': {'target_sensor': 'PS2'}})
+                kwargs['tools'] = tools
+
 
             success = False
 
