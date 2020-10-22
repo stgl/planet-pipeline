@@ -139,7 +139,7 @@ def load_data(*args, **kwargs):
                 query_and_geofilter["filter"]["config"] += [{
                                 "type": "StringInFilter",
                                 "field_name": "instrument",
-                                "config": ["PS2.SD"]
+                                "config": ["PS2.SD", "PS2"]
                             }]
                 tools = kwargs.get('tools', [])
                 tools.append({'harmonize': {'target_sensor': 'PS2'}})
