@@ -152,8 +152,8 @@ def load_data(*args, **kwargs):
                 try:
                     response = client.quick_search(query_and_geofilter)
                     success = True
-                except APIException as e:
-                    print('Query request failed with exception: ', e)
+                except:
+                    print('Query request failed')
                     print('Trying again.')
 
             ids = []
